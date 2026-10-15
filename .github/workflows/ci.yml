@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  escenarios-sql:
+    name: Escenarios de seguridad y negocio (SQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ejecutar migraciones y escenarios
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: |
+          set +e
+          out=$(supabase/tests/escenarios/ejecutar.sh 2>&1)
+          echo "$out" | grep -E "PASA|FALLA|ERROR|TODAS" || echo "$out"
+          echo "$out" | grep -q "TODAS LAS PRUEBAS PASARON"
+
+  # La tarea T-001 agrega aquí el job "app" (lint, typecheck, test, build).
