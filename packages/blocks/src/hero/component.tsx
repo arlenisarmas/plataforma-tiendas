@@ -23,7 +23,10 @@ export function Hero({ props, variant, ctx }: Props) {
           </a>
         )}
       </div>
-      {imageUrl && variant !== 'minimal' && <img src={imageUrl} alt={props.image?.alt ?? ''} loading="lazy" />}
+      {imageUrl && variant !== 'minimal' && (
+        // La portada suele ser el elemento más grande visible: se carga con prioridad, no diferida.
+        <img src={imageUrl} alt={props.image?.alt ?? ''} fetchPriority="high" decoding="async" />
+      )}
     </section>
   );
 }
