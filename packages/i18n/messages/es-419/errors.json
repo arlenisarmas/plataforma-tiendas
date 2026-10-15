@@ -1,0 +1,22 @@
+{
+  "SIN_SESION": "Tu sesión terminó. Volvé a ingresar.",
+  "SIN_PERMISO": "No tenés permiso para hacer esto. Pedile acceso al dueño de la tienda.",
+  "DIRECCION_EN_USO": "Esa dirección ya la usa otra tienda. Probá con otra.",
+  "LIMITE_DE_TIENDAS": "Llegaste al máximo de tiendas. Escribinos si necesitás más.",
+  "FALTA_PUBLICAR_INICIO": "Antes de abrir tu tienda, publicá la página de inicio.",
+  "TIENDA_SUSPENDIDA": "Tu tienda está pausada. Escribinos para reactivarla.",
+  "ULTIMO_DUENO": "La tienda necesita al menos un dueño. Nombrá a otra persona antes.",
+  "INVITACION_INVALIDA": "Esta invitación ya no es válida. Pedí una nueva.",
+  "INVITACION_OTRO_EMAIL": "Esta invitación es para otro email. Ingresá con el email invitado.",
+  "PAGINA_NO_EXISTE": "No encontramos esa página. Actualizá e intentá de nuevo.",
+  "VERSION_NO_EXISTE": "No encontramos esa página. Actualizá e intentá de nuevo.",
+  "STOCK_INSUFICIENTE": "Alguien se llevó las últimas unidades. Ajustá la cantidad.",
+  "STOCK_MENOR_A_RESERVADO": "No podés dejar menos stock del que ya está reservado en pedidos.",
+  "MOTIVO_INVALIDO": "Revisá la cantidad que ingresaste.",
+  "CANTIDAD_INVALIDA": "Revisá la cantidad que ingresaste.",
+  "CAMBIO_DE_ESTADO_INVALIDO": "Ese cambio de estado no es posible para este pedido.",
+  "PAGO_NO_EXISTE": "Este pago ya fue revisado.",
+  "PAGO_YA_RESUELTO": "Este pago ya fue revisado.",
+  "SOLO_PAGOS_MANUALES": "Este pago se confirma automáticamente.",
+  "PEDIDO_NO_ENCONTRADO": "No encontramos tu pedido. Revisá el link del mail."
+}

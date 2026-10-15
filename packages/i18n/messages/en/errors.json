@@ -1,0 +1,22 @@
+{
+  "SIN_SESION": "Your session ended. Please sign in again.",
+  "SIN_PERMISO": "You don't have permission to do this. Ask the store owner for access.",
+  "DIRECCION_EN_USO": "Another store uses that address. Try a different one.",
+  "LIMITE_DE_TIENDAS": "You've reached the store limit. Contact us if you need more.",
+  "FALTA_PUBLICAR_INICIO": "Publish your home page before opening your store.",
+  "TIENDA_SUSPENDIDA": "Your store is paused. Contact us to reactivate it.",
+  "ULTIMO_DUENO": "The store needs at least one owner. Assign another person first.",
+  "INVITACION_INVALIDA": "This invitation is no longer valid. Ask for a new one.",
+  "INVITACION_OTRO_EMAIL": "This invitation belongs to another email. Sign in with the invited email.",
+  "PAGINA_NO_EXISTE": "We couldn't find that page. Refresh and try again.",
+  "VERSION_NO_EXISTE": "We couldn't find that page. Refresh and try again.",
+  "STOCK_INSUFICIENTE": "The last units have sold. Adjust the quantity.",
+  "STOCK_MENOR_A_RESERVADO": "You can't leave fewer units than are reserved in orders.",
+  "MOTIVO_INVALIDO": "Check the amount you entered.",
+  "CANTIDAD_INVALIDA": "Check the amount you entered.",
+  "CAMBIO_DE_ESTADO_INVALIDO": "That status change isn't possible for this order.",
+  "PAGO_NO_EXISTE": "This payment has already been reviewed.",
+  "PAGO_YA_RESUELTO": "This payment has already been reviewed.",
+  "SOLO_PAGOS_MANUALES": "This payment is confirmed automatically.",
+  "PEDIDO_NO_ENCONTRADO": "We couldn't find your order. Check the link in your email."
+}

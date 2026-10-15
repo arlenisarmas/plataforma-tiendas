@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./request": "./src/request.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -14,5 +15,8 @@
   },
   "devDependencies": {
     "@plataforma/config": "workspace:*"
+  },
+  "dependencies": {
+    "next-intl": "4.13.0"
   }
 }
