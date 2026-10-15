@@ -56,13 +56,8 @@ export function formatRelative(
   timeZone: string,
   now: Date | number = Date.now(),
 ): string {
-  const formatter = new Intl.DateTimeFormat(locale, {
-    timeZone,
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-  });
-  formatter.format(value);
+  // Valida la zona horaria (lanza RangeError si no existe) antes de calcular la diferencia.
+  new Intl.DateTimeFormat(locale, { timeZone });
   const seconds = (Number(value) - Number(now)) / 1000;
   const absolute = Math.abs(seconds);
   const [unit, divisor] =
