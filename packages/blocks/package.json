@@ -4,15 +4,30 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./styles.css": "./src/blocks.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config ../config/vitest.mjs",
+    "test:visual": "playwright test",
     "lint": "eslint .",
     "build": "tsc --noEmit"
   },
   "devDependencies": {
-    "@plataforma/config": "workspace:*"
+    "@plataforma/config": "workspace:*",
+    "@plataforma/i18n": "workspace:*",
+    "@playwright/test": "1.64.1",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "peerDependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
   }
 }
