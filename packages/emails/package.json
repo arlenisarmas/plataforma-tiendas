@@ -1,0 +1,18 @@
+{
+  "name": "@plataforma/emails",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config ../config/vitest.mjs",
+    "lint": "eslint .",
+    "build": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@plataforma/config": "workspace:*"
+  }
+}
