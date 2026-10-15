@@ -7,8 +7,9 @@ Este archivo es obligatorio para cualquier agente que escriba código en este re
 ## 1. Antes de empezar una tarea
 
 1. Leé el issue completo, incluidos los criterios de aceptación y las dependencias.
-2. Verificá que las dependencias del issue estén cerradas. Si no, no empieces: comentá
-   `Bloqueado por #N` y pasá a otra tarea `estado:listo-para-codex`.
+2. Verificá que las dependencias del issue estén cerradas **o resueltas antes en el mismo lote**
+   (en ese caso, construí sobre los commits anteriores de la rama del lote). Si no, no empieces:
+   comentá `Bloqueado por #N` y pasá a la siguiente tarea del lote.
 3. Leé los documentos de `docs/` que el issue referencia.
 4. Cambiá la etiqueta del issue a `estado:en-progreso`.
 5. Creá la rama del lote `codex/lote-<n>` desde `main` actualizado (una sola rama para todo el lote).
