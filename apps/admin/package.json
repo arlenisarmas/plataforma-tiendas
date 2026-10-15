@@ -14,6 +14,7 @@
   "dependencies": {
     "@plataforma/i18n": "workspace:*",
     "@plataforma/ui": "workspace:*",
+    "next-intl": "4.13.0",
     "next": "16.4.1",
     "react": "19.3.1",
     "react-dom": "19.3.1"
