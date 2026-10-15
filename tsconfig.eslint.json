@@ -1,0 +1,12 @@
+{
+  "extends": "./packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@plataforma/*": ["packages/*/src/index.ts"],
+      "@plataforma/admin": ["apps/admin/app/page.tsx"],
+      "@plataforma/storefront": ["apps/storefront/app/page.tsx"]
+    }
+  },
+  "include": ["apps/**/*.ts", "apps/**/*.tsx", "packages/**/*.ts", "packages/**/*.tsx"]
+}
