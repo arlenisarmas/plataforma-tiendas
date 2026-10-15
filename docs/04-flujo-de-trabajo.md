@@ -82,6 +82,19 @@ link del issue en Codex; a partir de ahí Codex sigue el ciclo de este documento
 > de Arle, la protección de `main` exige **checks de CI**, no aprobaciones formales; la
 > aprobación de Claude queda como revisión comentada + etiqueta `estado:aprobado`.
 
+## 5 bis. Trabajo por lotes (decisión de Arle, 15/10/2026)
+
+Para ahorrar consumo, las tareas se asignan **en lotes** (por ejemplo, 5 o 10 tareas):
+
+- Un lote = una rama `codex/lote-<n>` = **un único PR**, con **un commit por tarea**.
+- Claude revisa el PR tarea por tarea (commit por commit). Si una tarea tiene problemas,
+  pide cambios solo sobre esa; las demás no se rehacen.
+- Se integra con **rebase merge** (no squash) para conservar un commit por tarea en `main`
+  y poder revertir una tarea sin afectar las demás. Si el repositorio solo permite squash,
+  se integra igual y se documenta qué tareas incluye el commit.
+- Un lote no mezcla tareas que dependan de otras del mismo lote, salvo que el orden quede
+  indicado y las dependencias se resuelvan dentro del lote.
+
 ## 6. Trabajo en paralelo sin choques
 
 - Las tareas se agrupan en **olas**. Dentro de una ola, las tareas tocan áreas distintas.

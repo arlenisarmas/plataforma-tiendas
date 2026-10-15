@@ -18,11 +18,16 @@ Este archivo es obligatorio para cualquier agente que escriba código en este re
 - Hacé **solo** lo que pide la tarea. Nada de refactors, dependencias nuevas ni mejoras
   "de paso". Si ves algo mejorable, anotalo en la descripción del PR bajo "Observaciones".
 - Tocá solo los archivos del área de la tarea. Si necesitás tocar otra área, preguntá en el issue.
-- Una tarea = un PR. PRs de más de ~400 líneas cambiadas deben dividirse: avisá en el issue.
-  **No cuentan** para ese límite: tests, tipos generados, lockfiles (`pnpm-lock.yaml`),
-  archivos generados por herramientas, ni configuración inicial de herramientas.
-- **Excepción:** las tareas de armado de estructura (`area:infra` de la Ola 0, como T-001)
-  pueden superar el límite en un único PR. No hace falta consultar.
+- **Trabajo por lotes: un lote = una rama = un PR.** Cuando se te asigna un lote de tareas,
+  hacelas todas en una sola rama `codex/lote-<n>` y abrí **un único PR** al terminar el lote.
+- **Un commit por tarea** dentro del PR, con mensaje `T-<número>: <descripción>`, para que cada
+  tarea se pueda revisar y, si hace falta, revertir por separado. No mezcles dos tareas en un commit.
+- Hacé las tareas del lote en el orden indicado. Si una queda bloqueada (falta una cuenta,
+  una clave o una decisión), saltéala, marcala en el issue y seguí con las demás.
+- El límite de ~400 líneas cambiadas aplica **por tarea**, no por PR. **No cuentan**: tests,
+  tipos generados, lockfiles (`pnpm-lock.yaml`), archivos generados por herramientas ni
+  configuración inicial de herramientas. Las tareas de estructura (`area:infra` de la Ola 0)
+  pueden superarlo.
 
 ## 3. Estándares de código
 
@@ -92,11 +97,11 @@ pnpm db:test   # si tocaste SQL
 
 ## 9. Pull Request
 
-- Título: `T-<número>: <descripción>`.
-- Descripción con la plantilla del repo: qué se hizo, cómo probarlo, capturas (si hay UI,
-  en móvil y escritorio), criterios de aceptación marcados, observaciones.
-- Incluí `Closes #<issue>`.
-- Cambiá la etiqueta del issue a `estado:en-revision`.
+- Título: `Lote <n>: T-<a>, T-<b>, ...` (o `T-<número>: <descripción>` si el lote tiene una sola tarea).
+- Descripción con la plantilla del repo, **con una sección por tarea**: qué se hizo, cómo probarlo,
+  capturas (si hay UI, en móvil y escritorio), criterios de aceptación marcados, observaciones.
+- Incluí un `Closes #<issue>` por cada tarea completada del lote.
+- Cambiá la etiqueta de cada issue del lote a `estado:en-revision`.
 
 ## 10. Revisión del arquitecto (Claude)
 
