@@ -201,13 +201,16 @@ aunque estén en la misma ola. Las olas solo agrupan; las dependencias mandan.
 - `types.ts` (contrato), `registry.ts`, `theme.ts` (esquema Zod + paletas curadas + `themeToCssVars`).
 - `renderPage(blocks, ctx)`: migra, valida con `safeParse`, ejecuta loaders en paralelo,
   omite bloques inválidos sin romper la página y registra el error.
-- Bloques: `hero`, `rich-text`, `spacer`.
+- Soporte de **variantes de diseño** (`variants`, `defaultVariant`, `onlyInVariants`) según `docs/03 §3`.
+- Bloques: `hero`, `rich-text`, `spacer`, **cada uno con todas sus variantes** de `docs/03 §4`.
 - `layout/`: encabezado y pie configurados por el tema.
 
 **Criterios de aceptación.**
 - [ ] Un bloque desconocido o inválido no rompe el render (test).
 - [ ] `migrate` probado con un bloque de prueba v1 → v2.
 - [ ] Las paletas curadas pasan contraste AA (test automático).
+- [ ] Cambiar `variant` no modifica ni pierde `props` (test). Variante inexistente → usa `defaultVariant`.
+- [ ] Cada variante renderiza a 360 px sin desbordes (test).
 
 ---
 
@@ -249,7 +252,7 @@ con la lista "Tu tienda al 100%".
 ## T-011 · Bloques de productos
 - **Área:** blocks · **Ola:** 2 · **Depende de:** T-008 · **Necesita a Arle:** no
 
-**Alcance.** `featured-products`, `category-grid`, `product-grid`, con loaders que leen de
+**Alcance.** `featured-products`, `category-grid`, `product-grid`, **con todas sus variantes de diseño** (`docs/03 §4`), con loaders que leen de
 `storefront.*`, tarjeta de producto reutilizable (foto, nombre, precio, precio tachado, "Sin stock").
 
 **Criterios de aceptación.**
@@ -261,7 +264,7 @@ con la lista "Tu tienda al 100%".
 ## T-012 · Bloques de contenido
 - **Área:** blocks · **Ola:** 2 · **Depende de:** T-008 · **Necesita a Arle:** no
 
-**Alcance.** `announcement-bar`, `image-with-text`, `gallery`, `testimonials`, `faq`, `contact`
+**Alcance.** `announcement-bar`, `image-with-text`, `gallery`, `testimonials`, `faq`, `contact`, **con todas sus variantes de diseño** (`docs/03 §4`)
 (WhatsApp con mensaje prearmado, teléfono, email, dirección con link a mapas, horarios, redes).
 
 **Criterios de aceptación.**
@@ -336,12 +339,14 @@ Integrarlas al asistente de T-010.
 **Alcance.** Según `docs/03-sistema-de-bloques.md §6`:
 - Lista de secciones: agregar (catálogo visual), mover (arrastrar y botones ↑↓), duplicar, ocultar, borrar con deshacer.
 - Formulario generado a partir de `fields` (todos los `kind`), modo simple/avanzado.
+- Botón **"Cambiar diseño"** por sección: selector de variantes con miniatura y vista previa; cambia solo `variant`.
 - Autoguardado de `draft_blocks` con indicador; deshacer/rehacer (50 pasos).
 - Diseño adaptado a celular (pasos en lugar de columnas).
 
 **Criterios de aceptación.**
 - [ ] e2e: cambiar foto y título de la portada en ≤ 1 min.
 - [ ] Recargar la página no pierde cambios.
+- [ ] e2e: cambiar el diseño de la portada entre sus variantes sin perder título, imagen ni botón.
 
 ---
 

@@ -11,7 +11,7 @@ Este archivo es obligatorio para cualquier agente que escriba código en este re
    `Bloqueado por #N` y pasá a otra tarea `estado:listo-para-codex`.
 3. Leé los documentos de `docs/` que el issue referencia.
 4. Cambiá la etiqueta del issue a `estado:en-progreso`.
-5. Creá la rama: `codex/T-<número>-<descripcion-corta>` desde `main` actualizado.
+5. Creá la rama del lote `codex/lote-<n>` desde `main` actualizado (una sola rama para todo el lote).
 
 ## 2. Alcance
 
@@ -105,10 +105,13 @@ pnpm db:test   # si tocaste SQL
 
 ## 10. Revisión del arquitecto (Claude)
 
-- Claude revisa cada PR. Sus pedidos de cambio son **instrucciones**: aplicalos en la misma
-  rama y respondé cada comentario con lo que hiciste.
+- Claude revisa cada PR cuando el lote está completo. Sus pedidos de cambio son **instrucciones**:
+  aplicalos en la misma rama del lote, con un commit `T-<número>: corrección ...` por tarea
+  corregida, y respondé cada comentario con lo que hiciste.
+- Correcciones chicas y claras las puede hacer Claude directamente en la rama, para ahorrar un ciclo.
+  Antes de seguir trabajando en una rama, hacé siempre `git pull`.
 - Si no estás de acuerdo con un pedido, explicá por qué en el comentario en lugar de ignorarlo.
-- Cuando Claude aprueba y CI está en verde, el PR se integra (squash merge).
+- Cuando Claude aprueba y CI está en verde, el PR se integra (rebase merge: queda un commit por tarea en `main`).
 - Si el issue tiene `estado:cambios-pedidos`, esa tarea tiene prioridad sobre tareas nuevas.
 
 ## 11. Cuándo detenerse y pedir ayuda
