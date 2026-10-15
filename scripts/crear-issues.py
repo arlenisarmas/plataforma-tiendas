@@ -6,7 +6,7 @@ Las referencias "T-xxx" del cuerpo se convierten en "#<número>" en una segunda 
 
 Uso:
   python3 scripts/crear-issues.py --repo usuario/repositorio [--dry-run]
-Requiere la CLI `gh` autenticada.
+Requiere la CLI `gh` autenticada (usa solo la API REST).
 """
 from __future__ import annotations
 
@@ -45,13 +45,19 @@ def parse_backlog() -> list[dict]:
     return tasks
 
 
-def gh(args: list[str], dry: bool, capture: bool = False) -> str:
+def api(method: str, path: str, payload: dict | None, dry: bool) -> object:
+    """Llama a la API REST de GitHub mediante `gh api`."""
     if dry:
-        print("  [dry-run] gh " + " ".join(args[:6]) + (" …" if len(args) > 6 else ""))
-        return ""
-    res = subprocess.run(["gh", *args], check=True, text=True,
-                         capture_output=capture)
-    return res.stdout if capture else ""
+        print(f"  [dry-run] {method} {path}")
+        return {}
+    args = ["gh", "api", "--method", method, path]
+    if payload is not None:
+        args += ["--input", "-"]
+    res = subprocess.run(args, input=json.dumps(payload) if payload is not None else None,
+                         text=True, capture_output=True)
+    if res.returncode != 0:
+        raise RuntimeError(f"{method} {path}: {res.stderr.strip() or res.stdout.strip()}")
+    return json.loads(res.stdout) if res.stdout.strip() else {}
 
 
 def render_body(task: dict, numbers: dict[str, int]) -> str:
@@ -78,17 +84,21 @@ def main() -> int:
     print(f"{len(tasks)} tareas en el backlog")
 
     print("Etiquetas…")
+    existing_labels = set()
+    if not a.dry_run:
+        existing_labels = {lb["name"] for lb in api("GET", f"repos/{a.repo}/labels?per_page=100", None, False)}
     for lb in json.loads(LABELS.read_text(encoding="utf-8")):
-        gh(["label", "create", lb["name"], "--repo", a.repo, "--color", lb["color"],
-            "--description", lb["description"], "--force"], a.dry_run)
+        data = {"name": lb["name"], "color": lb["color"], "description": lb["description"]}
+        if lb["name"] in existing_labels:
+            api("PATCH", f"repos/{a.repo}/labels/{lb['name'].replace(':', '%3A')}", data, a.dry_run)
+        else:
+            api("POST", f"repos/{a.repo}/labels", data, a.dry_run)
 
     existing: dict[str, int] = {}
     if not a.dry_run:
-        out = gh(["issue", "list", "--repo", a.repo, "--state", "all", "--limit", "500",
-                  "--json", "number,title"], False, capture=True)
-        for it in json.loads(out or "[]"):
+        for it in api("GET", f"repos/{a.repo}/issues?state=all&per_page=100", None, False):
             m = re.match(r"^(T-\d+):", it["title"])
-            if m:
+            if m and "pull_request" not in it:
                 existing[m.group(1)] = it["number"]
 
     print("Issues…")
@@ -101,20 +111,18 @@ def main() -> int:
                   "estado:listo-para-codex" if not t["deps"] else "estado:bloqueada"]
         if t["arle"]:
             labels.append("necesita-a-arle")
-        args = ["issue", "create", "--repo", a.repo, "--title", f"{t['id']}: {t['title']}",
-                "--body", render_body(t, numbers)]
-        for lb in labels:
-            args += ["--label", lb]
-        url = gh(args, a.dry_run, capture=True).strip()
-        if url:
-            numbers[t["id"]] = int(url.rstrip("/").rsplit("/", 1)[-1])
-            print(f"  {t['id']} → #{numbers[t['id']]}")
+        res = api("POST", f"repos/{a.repo}/issues",
+                  {"title": f"{t['id']}: {t['title']}", "body": render_body(t, numbers),
+                   "labels": labels}, a.dry_run)
+        if res:
+            numbers[t["id"]] = res["number"]
+            print(f"  {t['id']} → #{res['number']}")
 
     print("Enlazando dependencias…")
     for t in tasks:
         if t["id"] in numbers and not a.dry_run:
-            gh(["issue", "edit", str(numbers[t["id"]]), "--repo", a.repo,
-                "--body", render_body(t, numbers)], False)
+            api("PATCH", f"repos/{a.repo}/issues/{numbers[t['id']]}",
+                {"body": render_body(t, numbers)}, False)
     print("Listo.")
     return 0
 
