@@ -9,10 +9,12 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config ../config/vitest.mjs",
+    "test:coverage": "vitest run --config ../config/vitest.mjs --coverage --coverage.thresholds.statements=90 --coverage.thresholds.lines=90 --coverage.thresholds.functions=90",
     "lint": "eslint .",
     "build": "tsc --noEmit"
   },
   "devDependencies": {
-    "@plataforma/config": "workspace:*"
+    "@plataforma/config": "workspace:*",
+    "@vitest/coverage-v8": "5.0.5"
   }
 }
