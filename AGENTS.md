@@ -18,8 +18,11 @@ Este archivo es obligatorio para cualquier agente que escriba código en este re
 - Hacé **solo** lo que pide la tarea. Nada de refactors, dependencias nuevas ni mejoras
   "de paso". Si ves algo mejorable, anotalo en la descripción del PR bajo "Observaciones".
 - Tocá solo los archivos del área de la tarea. Si necesitás tocar otra área, preguntá en el issue.
-- Una tarea = un PR. PRs de más de ~400 líneas cambiadas (sin contar tests ni tipos generados)
-  deben dividirse: avisá en el issue.
+- Una tarea = un PR. PRs de más de ~400 líneas cambiadas deben dividirse: avisá en el issue.
+  **No cuentan** para ese límite: tests, tipos generados, lockfiles (`pnpm-lock.yaml`),
+  archivos generados por herramientas, ni configuración inicial de herramientas.
+- **Excepción:** las tareas de armado de estructura (`area:infra` de la Ola 0, como T-001)
+  pueden superar el límite en un único PR. No hace falta consultar.
 
 ## 3. Estándares de código
 
