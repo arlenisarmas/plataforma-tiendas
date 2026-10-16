@@ -12,14 +12,18 @@ export type RpcArgs<Name extends BusinessRpc> = Functions[Name]['Args'];
 export type RpcReturn<Name extends BusinessRpc> = Functions[Name]['Returns'];
 export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
-const businessCodes: readonly BusinessErrorCode[] = [
+const businessCodes = [
   'SIN_SESION', 'SIN_PERMISO', 'DIRECCION_EN_USO', 'LIMITE_DE_TIENDAS',
   'FALTA_PUBLICAR_INICIO', 'TIENDA_SUSPENDIDA', 'ULTIMO_DUENO', 'INVITACION_INVALIDA',
   'INVITACION_OTRO_EMAIL', 'PAGINA_NO_EXISTE', 'VERSION_NO_EXISTE',
   'STOCK_INSUFICIENTE', 'STOCK_MENOR_A_RESERVADO', 'MOTIVO_INVALIDO',
   'CANTIDAD_INVALIDA', 'CAMBIO_DE_ESTADO_INVALIDO', 'PAGO_NO_EXISTE',
   'PAGO_YA_RESUELTO', 'SOLO_PAGOS_MANUALES', 'PEDIDO_NO_ENCONTRADO',
-];
+] as const satisfies readonly BusinessErrorCode[];
+
+/** Breaks the typecheck if core adds a business code that this copy does not list. */
+type AssertNever<T extends never> = T;
+export type AllBusinessCodesListed = AssertNever<Exclude<BusinessErrorCode, (typeof businessCodes)[number]>>;
 
 /** Mirrors core.parseDbError without a runtime dependency from db to core. */
 function parseDbError(error: { message: string; details?: string; hint?: string; code?: string }): BusinessErrorCode | 'UNKNOWN' {
