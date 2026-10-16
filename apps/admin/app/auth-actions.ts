@@ -4,14 +4,14 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { userClient } from '../lib/server-client';
-import { chooseGuide, saveProfile, sendMagicLink, sendPasswordReset, signIn, signUp } from '../lib/auth-service';
+import { chooseGuide, saveProfile, sendMagicLink, sendPasswordReset, signIn } from '../lib/auth-service';
 import { allowAction } from '../lib/action-rate-limit';
 
 function origin() { return process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001'; }
 function fields(form: FormData) { return Object.fromEntries(form.entries()); }
 function authError(): never { redirect('/login?error=1'); }
 function safeInvitationPath(value: FormDataEntryValue | null): string | null {
-  const parsed = z.string().regex(/^\/invite\/[A-Za-z0-9_-]{32,100}$/).safeParse(value);
+  const parsed = z.string().regex(/^\/(invite|join)\/[A-Za-z0-9_-]{32,100}$/).safeParse(value);
   return parsed.success ? parsed.data : null;
 }
 
@@ -30,11 +30,9 @@ export async function loginAction(form: FormData) {
   redirect(safeInvitationPath(form.get('next')) ?? '/');
 }
 
-export async function signupAction(form: FormData) {
-  if (!await allowAction('signup', 3, 600_000)) authError();
-  const result = await signUp(await userClient(), fields(form), `${origin()}/auth/callback?first=1`).catch(authError);
-  if (result.error) authError();
-  redirect(result.data.session ? '/welcome' : '/login?sent=1');
+// Registro abierto cerrado (T-035): las cuentas se crean al aceptar una invitación (/join, /invite).
+export async function signupAction() {
+  redirect('/signup');
 }
 
 export async function magicAction(form: FormData) {

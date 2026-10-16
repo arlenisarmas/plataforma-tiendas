@@ -5,7 +5,8 @@ const publicPaths = ['/login', '/signup', '/forgot', '/reset/new', '/auth/callba
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  if (publicPaths.some((publicPath) => path === publicPath) || path.startsWith('/_next/')) return NextResponse.next();
+  if (publicPaths.some((publicPath) => path === publicPath) || path.startsWith('/_next/')
+    || path.startsWith('/join/') || path.startsWith('/invite/')) return NextResponse.next();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return NextResponse.redirect(new URL('/login', request.url));

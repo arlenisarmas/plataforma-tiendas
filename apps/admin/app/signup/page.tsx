@@ -1,15 +1,16 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { AuthShell } from '../auth-shell';
-import { signupAction } from '../auth-actions';
 import { adminText } from '../../lib/locale';
+import { tokenPattern } from '../../lib/join';
 
-export default async function SignupPage() {
+/** El registro abierto está cerrado (T-035): solo se entra con una invitación. */
+export default async function SignupPage({ searchParams }: { searchParams: Promise<{ invite?: string }> }) {
+  const { invite } = await searchParams;
+  if (invite && tokenPattern.test(invite)) redirect(`/join/${invite}`);
   const t = await adminText();
   return <AuthShell title={t('signUp')}>
-    <form action={signupAction} className="space-y-4">
-      <label className="block">{t('email')}<input className="auth-input" type="email" name="email" autoComplete="email" required /></label>
-      <label className="block">{t('password')}<input className="auth-input" type="password" name="password" autoComplete="new-password" minLength={8} required /></label>
-      <button className="auth-primary" type="submit">{t('createAccount')}</button>
-    </form><Link href="/login">{t('backToLogin')}</Link>
+    <p role="status" className="m-0 rounded-xl border border-[#232733] bg-[#171a23] p-4 leading-relaxed text-[#c9cdd8]">{t('join.closed')}</p>
+    <Link href="/login" className="auth-secondary self-start">{t('join.backToLogin')}</Link>
   </AuthShell>;
 }
