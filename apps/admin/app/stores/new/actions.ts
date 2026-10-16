@@ -43,7 +43,7 @@ export async function createStoreAction(
   });
   if (error || !storeId) {
     if (error?.message.includes('DIRECCION_EN_USO')) return { error: 'used' };
-    if (error?.message.includes('LIMITE_DE_TIENDAS')) return { error: 'limit' };
+    if (error?.message.includes('LIMITE_DE_TIENDAS') || error?.message.includes('SIN_PERMISO_PARA_CREAR')) return { error: 'limit' };
     return { error: 'failed' };
   }
   const locale = await adminLocale();

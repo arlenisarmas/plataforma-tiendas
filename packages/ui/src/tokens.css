@@ -253,3 +253,73 @@
 .ui-badge[data-status='danger'] {
   color: var(--ui-danger);
 }
+.ui-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.ui-wizard {
+  display: grid;
+  gap: var(--ui-space-6);
+}
+.ui-wizard-top {
+  display: grid;
+  gap: var(--ui-space-3);
+}
+.ui-wizard-count {
+  margin: 0;
+  color: var(--ui-muted);
+  font-size: 0.875rem;
+}
+.ui-wizard-bars {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--ui-space-2);
+}
+.ui-wizard-bars span {
+  height: 6px;
+  border-radius: 3px;
+  background: #262a36;
+}
+.ui-wizard-bars span[data-done='true'] {
+  background: #7c80f2;
+}
+.ui-wizard-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.ui-wizard-main {
+  flex: 1 1 420px;
+  min-width: 0;
+  display: grid;
+  gap: var(--ui-space-4);
+}
+.ui-wizard-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.125rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.ui-wizard-help {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.ui-wizard-fields {
+  gap: var(--ui-space-4);
+}
+.ui-wizard-next {
+  flex: 1 1 auto;
+  min-height: 52px;
+}
+.ui-wizard-aside {
+  flex: 1 1 360px;
+  min-width: 0;
+}
