@@ -33,5 +33,14 @@
   "saved": "Tus cambios están guardados.",
   "saveError": "No pudimos guardar. Intentá de nuevo.",
   "signOut": "Salir",
-  "googleSoon": "Ingresar con Google estará disponible más adelante."
+  "googleSoon": "Ingresar con Google estará disponible más adelante.",
+  "navLabel": "Secciones de tu tienda",
+  "nav": { "home": "Inicio", "products": "Productos", "orders": "Pedidos", "page": "Mi página", "customers": "Clientes", "settings": "Ajustes" },
+  "selectStore": "Elegir tienda", "openStore": "Abrir tienda",
+  "quickSearch": "¿Qué querés hacer?", "quickAddProduct": "Agregar producto", "quickColors": "Cambiar colores", "quickOrders": "Ver pedidos de hoy",
+  "checklistTitle": "Tu tienda al 100%", "checklistCount": "{count} de 6 pasos listos", "completed": "Listo", "pending": "Pendiente",
+  "checklist": { "logo": "Agregar logo", "product": "Agregar primer producto", "payment": "Elegir cómo te pagan", "shipping": "Configurar envíos", "page": "Preparar página de inicio", "publish": "Publicar tienda" },
+  "today": "Hoy", "ordersToday": "{count} pedidos hoy", "notifications": "Notificaciones", "noNotifications": "No hay avisos nuevos.",
+  "viewNotification": "Ver detalle", "markRead": "Marcar como leída", "sectionSoon": "Esta sección estará disponible pronto.",
+  "loading": "Preparando tu tienda...", "loadError": "No pudimos mostrar tu tienda. Intentá de nuevo.", "retry": "Intentar de nuevo"
 }
