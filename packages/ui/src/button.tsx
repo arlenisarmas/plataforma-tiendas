@@ -4,12 +4,14 @@ import { clsx } from 'clsx';
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'danger';
   loading?: boolean;
+  loadingLabel?: string;
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     variant = 'primary',
     loading = false,
+    loadingLabel,
     disabled,
     children,
     className,
@@ -31,7 +33,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {loading ? (
         <>
           <span aria-hidden="true">⏳</span>
-          <span>Cargando…</span>
+          <span>{loadingLabel ?? children}</span>
         </>
       ) : (
         children

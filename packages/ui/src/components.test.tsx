@@ -36,7 +36,7 @@ describe('accessible components', () => {
         <Button>Guardar</Button>
         <Button variant="secondary">Volver</Button>
         <Button variant="danger">Borrar</Button>
-        <Button loading>Guardar</Button>
+        <Button loading loadingLabel="Cargando…">Guardar</Button>
       </>,
     );
     expect((screen.getByRole('button', { name: 'Cargando…' }) as HTMLButtonElement).disabled).toBe(
@@ -131,6 +131,7 @@ describe('accessible components', () => {
   it('StepWizard shows progress and limits fields', async () => {
     await expectAccessible(
       <StepWizard
+        labels={{ back: 'Atrás', next: 'Siguiente', finish: 'Terminar', progress: (step, total) => `Paso ${step} de ${total}` }}
         steps={[
           {
             title: 'Nombre',
@@ -150,6 +151,7 @@ describe('accessible components', () => {
     expect(() =>
       render(
         <StepWizard
+          labels={{ back: 'Atrás', next: 'Siguiente', finish: 'Terminar', progress: (step, total) => `Paso ${step} de ${total}` }}
           steps={[{ title: 'Demasiados', fields: [1, 2, 3, 4] }]}
           onComplete={() => undefined}
         />,

@@ -44,6 +44,12 @@ importers:
 
   apps/admin:
     dependencies:
+      '@plataforma/blocks':
+        specifier: workspace:*
+        version: link:../../packages/blocks
+      '@plataforma/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@plataforma/db':
         specifier: workspace:*
         version: link:../../packages/db

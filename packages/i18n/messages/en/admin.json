@@ -1,4 +1,6 @@
 {
+  "storeTemplate": { "about": "About us", "contact": "Contact", "faq": "Frequently asked questions", "aboutBody": "Tell visitors what makes your business special." },
+  "createStore": { "title": "Create your store", "nameStep": "What's your business called?", "name": "Business name", "address": "Store address", "addressAvailable": "This address is available.", "addressUsed": "This address is taken. Try another.", "addressInvalid": "Use 3 to 40 letters, numbers, or hyphens.", "checking": "Checking the address.", "industryStep": "What do you sell?", "industry": "Industry", "general": "A bit of everything", "countryStep": "Where is your business?", "country": "Country", "advanced": "Adjust language and time zone", "locale": "Language", "timezone": "Time zone", "finishStep": "Choose your style", "logo": "Logo (optional)", "skipLogo": "I'll do it later", "palette": "Colors", "preview": "Color preview", "back": "Back", "next": "Next", "finish": "Create my store", "progress": "Step {step} of {total}", "creating": "Creating your store…", "invalid": "Check your details and try again.", "limit": "You've reached the store limit for this account.", "failed": "We couldn't create your store. Try again." },
   "title": "Your store",
   "description": "We're preparing a place to manage your business.",
   "signIn": "Sign in",

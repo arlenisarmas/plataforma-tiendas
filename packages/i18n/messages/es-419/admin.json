@@ -1,4 +1,6 @@
 {
+  "storeTemplate": { "about": "Sobre nosotros", "contact": "Contacto", "faq": "Preguntas frecuentes", "aboutBody": "Contá qué hace especial a tu negocio." },
+  "createStore": { "title": "Creá tu tienda", "nameStep": "¿Cómo se llama tu negocio?", "name": "Nombre del negocio", "address": "Dirección de tu tienda", "addressAvailable": "Esta dirección está disponible.", "addressUsed": "Esta dirección ya se usa. Probá otra.", "addressInvalid": "Usá entre 3 y 40 letras, números o guiones.", "checking": "Estamos comprobando la dirección.", "industryStep": "¿Qué vendés?", "industry": "Rubro", "general": "De todo un poco", "countryStep": "¿Dónde está tu negocio?", "country": "País", "advanced": "Ajustar idioma y zona horaria", "locale": "Idioma", "timezone": "Zona horaria", "finishStep": "Dale tu estilo", "logo": "Logo (opcional)", "skipLogo": "Lo hago después", "palette": "Colores", "preview": "Vista previa de los colores", "back": "Atrás", "next": "Siguiente", "finish": "Crear mi tienda", "progress": "Paso {step} de {total}", "creating": "Creando tu tienda…", "invalid": "Revisá los datos e intentá de nuevo.", "limit": "Llegaste al máximo de tiendas para esta cuenta.", "failed": "No pudimos crear la tienda. Intentá de nuevo." },
   "title": "Tu tienda",
   "description": "Estamos preparando un lugar para administrar tu negocio.",
   "signIn": "Ingresar",

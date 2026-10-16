@@ -37,7 +37,7 @@ export function UiCatalog() {
           <Button onClick={() => setNotice('Guardado. Podés seguir editando.')}>Guardar</Button>
           <Button variant="secondary">Volver</Button>
           <Button variant="danger">Borrar</Button>
-          <Button loading>Guardar</Button>
+          <Button loading loadingLabel="Cargando…">Guardar</Button>
         </div>
       </Card>
       <Card aria-label="Campos">
@@ -101,6 +101,7 @@ export function UiCatalog() {
       </Card>
       <Card aria-label="Asistente">
         <StepWizard
+          labels={{ back: 'Atrás', next: 'Siguiente', finish: 'Terminar', progress: (step, total) => `Paso ${step} de ${total}` }}
           steps={[
             {
               title: 'Nombre',
