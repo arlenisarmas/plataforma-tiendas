@@ -6,7 +6,7 @@ import type { Theme } from './theme';
 
 const instanceSchema = z.object({
   id: z.string().min(1), type: z.string().min(1), version: z.number().int().positive(),
-  variant: z.string().optional(), props: z.unknown(),
+  variant: z.string().optional(), props: z.unknown(), hidden: z.boolean().optional(),
 });
 export type BlockRenderError = {
   id?: string;
@@ -33,6 +33,7 @@ export async function renderPage(input: unknown, ctx: StoreContext, theme: Theme
     const parsed = instanceSchema.safeParse(raw);
     if (!parsed.success) return fail({ reason: 'invalid-block' });
     const block = parsed.data;
+    if (block.hidden) return null;
     const identity = { id: block.id, type: block.type };
     if (seen.has(block.id)) return fail({ ...identity, reason: 'duplicate-id' });
     seen.add(block.id);

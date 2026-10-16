@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useId, useState, useTransition } from 'react';
 import { compressImage } from '../lib/compress-image';
 import { uploadMedia } from './media-actions';
 
@@ -8,12 +8,14 @@ type Asset = { id: string; path: string; alt_text: string | null; size_bytes: nu
 type Labels = { choose: string; upload: string; camera: string; alt: string; suggestion: string;
   invalid: string; failed: string; selected: string; empty: string };
 
-export function MediaPicker({ storeId, folder, initial, labels, name = 'assetId', onSelect }: {
+export function MediaPicker({ storeId, folder, initial, labels, name = 'assetId', current, onSelect }: {
   storeId: string; folder: 'library' | 'products' | 'blocks' | 'logos'; initial: Asset[];
-  labels: Labels; name?: string; onSelect?: (asset: Asset) => void;
+  labels: Labels; name?: string; current?: string | undefined; onSelect?: (asset: Asset) => void;
 }) {
+  const fileId = useId();
+  const altId = useId();
   const [assets, setAssets] = useState(initial);
-  const [selected, setSelected] = useState<string>();
+  const [selected, setSelected] = useState<string | undefined>(current);
   const [file, setFile] = useState<File>();
   const [alt, setAlt] = useState('');
   const [error, setError] = useState('');
@@ -34,12 +36,12 @@ export function MediaPicker({ storeId, folder, initial, labels, name = 'assetId'
   });
   return <div className="space-y-4">
     <div className="rounded-xl border border-slate-300 p-4">
-      <label className="block font-semibold" htmlFor="media-file">{labels.upload}</label>
-      <input id="media-file" className="auth-input" type="file" accept="image/*"
+      <label className="block font-semibold" htmlFor={fileId}>{labels.upload}</label>
+      <input id={fileId} className="auth-input" type="file" accept="image/*"
         onChange={(event) => { const next = event.target.files?.[0]; setFile(next); setAlt(next?.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') ?? ''); setError(''); }} />
       <p className="mt-1 text-sm">{labels.camera}</p>
-      <label className="mt-3 block font-semibold" htmlFor="media-alt">{labels.alt}</label>
-      <input id="media-alt" className="auth-input" value={alt} maxLength={300} placeholder={labels.suggestion}
+      <label className="mt-3 block font-semibold" htmlFor={altId}>{labels.alt}</label>
+      <input id={altId} className="auth-input" value={alt} maxLength={300} placeholder={labels.suggestion}
         onChange={(event) => setAlt(event.target.value)} />
       <button className="auth-primary mt-4" type="button" disabled={pending} onClick={submit}>{labels.upload}</button>
       {error && <p className="mt-2 text-red-700" role="alert">{error}</p>}

@@ -14,7 +14,10 @@ export default async function SectionPage({ params, searchParams }: {
     <main className="space-y-4 p-4 md:p-8">
       <h1 className="text-3xl font-bold">{t(`nav.${section}` as 'nav.products')}</h1>
       <p>{t('sectionSoon')}</p>
-      {section === 'page' && <a className="auth-primary" href={`/page/media?store=${context.selected.id}`}>{t('media.title')}</a>}
+      {section === 'page' && <div className="flex flex-wrap gap-3">
+        <a className="auth-primary" href={`/page/edit?store=${context.selected.id}`}>{t('editor.title')}</a>
+        <a className="auth-secondary" href={`/page/media?store=${context.selected.id}`}>{t('media.title')}</a>
+      </div>}
     </main>
   </PanelShell>;
 }
