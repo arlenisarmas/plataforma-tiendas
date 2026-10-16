@@ -100,7 +100,12 @@ describe('block rendering', () => {
               ? { body: '<img src=x onerror=alert(1)>' }
               : {};
         const html = renderToStaticMarkup(
-          await renderPage([{ id: 'a', type: definition.type, version: 1, variant: variant.id, props }], ctx, theme),
+          await renderPage([{ id: 'a', type: definition.type, version: 1, variant: variant.id, props }], ctx, theme, {
+            resolveDefinition: (type) => type === definition.type ? { ...definition,
+              loader: async () => type === 'featured-products' || type === 'product-grid'
+                ? { items: [], outOfStockLabel: 'Sin stock' } : [],
+            } as unknown as BlockDefinition : undefined,
+          }),
         );
         expect(html).toContain(`data-variant="${variant.id}"`);
         expect(html).not.toContain('<script>');

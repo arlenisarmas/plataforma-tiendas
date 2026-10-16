@@ -12,6 +12,18 @@ const style = Object.entries(themeToCssVars(theme))
   .map(([key, value]) => `${key}:${value}`)
   .join(';');
 const css = await readFile(new URL('../src/blocks.css', import.meta.url), 'utf8');
+const product = { id: assetId, store_id: assetId, name: 'Mesa artesanal de madera', slug: 'mesa-artesanal',
+  is_featured: true, category_id: null, currency: 'ARS', image: { product_id: assetId, store_id: assetId,
+    asset_id: assetId, alt_text: 'Mesa artesanal', position: 0 },
+  variant: { id: assetId, store_id: assetId, product_id: assetId, price_amount: 1550000,
+    compare_at_amount: 1700000, is_available: false, is_default: true } };
+function previewData(type: string) {
+  if (type === 'featured-products' || type === 'product-grid')
+    return { items: Array.from({ length: 4 }, (_, index) => ({ ...product, id: `${assetId}-${index}` })), outOfStockLabel: 'Sin stock' };
+  if (type === 'category-grid') return Array.from({ length: 4 }, (_, index) =>
+    ({ id: `${assetId}-${index}`, store_id: assetId, name: 'Muebles del hogar', slug: 'muebles', image_asset_id: assetId }));
+  return [];
+}
 
 for (const definition of registry) {
   for (const variant of definition.variants) {
@@ -27,6 +39,9 @@ for (const definition of registry) {
         [{ id: 'one', type: definition.type, version: 1, variant: variant.id, props }],
         { storeId: 'store', locale: 'es-419', assetUrl: () => image },
         theme,
+        { resolveDefinition: (type) => type === definition.type ? { ...definition,
+          loader: async () => previewData(type),
+        } : undefined },
       );
       await page.setContent(
         `<html><style>${css}</style><body style="margin:0"><main class="store-layout" style="${style}">${renderToStaticMarkup(blocks)}</main></body></html>`,
@@ -37,6 +52,12 @@ for (const definition of registry) {
         await page.screenshot({ path: 'visual/screenshots/hero-mobile.png', fullPage: true });
         await page.setViewportSize({ width: 1280, height: 800 });
         await page.screenshot({ path: 'visual/screenshots/hero-desktop.png', fullPage: true });
+      }
+      if (process.env.CAPTURE_BLOCKS === '1' && definition.type === 'product-grid' && variant.id === 'grid-2') {
+        await mkdir(new URL('./screenshots', import.meta.url), { recursive: true });
+        await page.screenshot({ path: 'visual/screenshots/products-mobile.png', fullPage: true });
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.screenshot({ path: 'visual/screenshots/products-desktop.png', fullPage: true });
       }
     });
   }
