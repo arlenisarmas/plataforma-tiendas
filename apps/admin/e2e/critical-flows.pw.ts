@@ -101,6 +101,9 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
   await timed('Comprar como cliente desde celular o escritorio', 2 * 60_000, info, async () => {
     await page.goto('http://chepeludos.localhost:3000/producto/collar-reflectivo');
     await page.getByRole('button', { name: 'Agregar al carrito' }).click();
+    await expect(page.getByRole('button', { name: 'Agregado al carrito' }).or(errorAlert(page)))
+      .toBeVisible({ timeout: 20_000 });
+    await expect(errorAlert(page)).toHaveCount(0);
     await page.goto('http://chepeludos.localhost:3000/carrito');
     await page.getByRole('link', { name: 'Finalizar compra' }).click();
     await page.getByLabel('Nombre completo').fill('Compradora de prueba');

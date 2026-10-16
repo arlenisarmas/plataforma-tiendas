@@ -3,7 +3,9 @@ export default defineConfig({
   testDir: './e2e',
   testMatch: '*.pw.ts',
   ...(process.env.CI ? { workers: 1 } : {}),
-  use: { baseURL: 'http://localhost:3001', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+  use: { baseURL: 'http://localhost:3001', trace: 'retain-on-failure', screenshot: 'only-on-failure',
+    // Fail fast with a clear message instead of waiting for the whole test timeout.
+    actionTimeout: 20_000, navigationTimeout: 60_000 },
   projects: [
     { name: 'mobile', use: { ...devices['Pixel 5'], viewport: { width: 360, height: 800 } } },
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
