@@ -9,8 +9,9 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
   ],
   webServer: [
-    { command: 'pnpm dev', url: 'http://localhost:3001/login', reuseExistingServer: !process.env.CI, timeout: 120_000 },
-    { command: 'pnpm --filter @plataforma/storefront dev', url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI, timeout: 120_000 },
+    { command: 'pnpm dev', url: 'http://localhost:3001/login', reuseExistingServer: !process.env.CI, timeout: 300_000 },
+    // The bare host has no store (404); readiness needs a page that answers 2xx.
+    { command: 'pnpm --filter @plataforma/storefront dev', url: 'http://localhost:3000/?tienda=chepeludos',
+      reuseExistingServer: !process.env.CI, timeout: 300_000 },
   ],
 });
