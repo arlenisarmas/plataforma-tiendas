@@ -182,7 +182,7 @@ test('the admin invites a person who sets a password and lands in My space', asy
 
   await test.step('Una persona sin permiso no ve la consola y el registro abierto está cerrado', async () => {
     await page.goto('/platform');
-    await expect(page.getByRole('alert')).toContainText('No tienes permiso');
+    await expect(page.getByRole('alert').filter({ hasText: /\S/ })).toContainText('No tienes permiso');
     await page.context().clearCookies();
     await page.goto('/signup');
     await expect(page.getByRole('status')).toContainText('solo por invitación');
