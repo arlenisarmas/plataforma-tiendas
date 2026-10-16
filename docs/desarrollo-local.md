@@ -16,7 +16,7 @@
 
 | Necesito… | Sin Docker | Con Docker + Supabase CLI |
 |---|---|---|
-| Probar migraciones y reglas de seguridad | El CI corre los 53 escenarios (`escenarios-sql`) en cada PR | `pnpm db:test` contra una base descartable |
+| Probar migraciones y reglas de seguridad | El CI corre los escenarios (`escenarios-sql`) en cada PR | `pnpm db:test` contra una base descartable |
 | Probar migraciones + seed en Supabase real | El workflow **Supabase local** lo hace en cada PR que toque `supabase/` | `pnpm db:start` y `pnpm db:reset` |
 | Regenerar los tipos (`packages/db/src/database.types.ts`) | Si cambian, el workflow falla y deja el artefacto **database-types**: descargarlo y reemplazar el archivo | `pnpm db:types` |
 
