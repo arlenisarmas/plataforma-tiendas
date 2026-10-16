@@ -13,6 +13,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@plataforma/core": "workspace:*",
     "@plataforma/blocks": "workspace:*",
     "react-dom": "19.3.1",
     "@plataforma/i18n": "workspace:*",

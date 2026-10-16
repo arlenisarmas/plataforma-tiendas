@@ -105,6 +105,9 @@ importers:
       '@plataforma/blocks':
         specifier: workspace:*
         version: link:../../packages/blocks
+      '@plataforma/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@plataforma/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
