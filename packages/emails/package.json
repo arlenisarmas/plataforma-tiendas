@@ -9,10 +9,22 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config ../config/vitest.mjs",
+    "preview": "tsx src/preview.ts",
     "lint": "eslint .",
     "build": "tsc --noEmit"
   },
   "devDependencies": {
-    "@plataforma/config": "workspace:*"
+    "@plataforma/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
+    "tsx": "4.20.6"
+  },
+  "dependencies": {
+    "@react-email/components": "1.0.12",
+    "@react-email/render": "2.1.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
   }
 }

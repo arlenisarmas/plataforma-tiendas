@@ -1,0 +1,22 @@
+{
+  "orderConfirmation": "We received order #{number} at {store}",
+  "paymentConfirmed": "Payment confirmed at {store}",
+  "orderReady": "Update on order #{number} at {store}",
+  "newOrder": "New order #{number} at {store}",
+  "teamInvitation": "You are invited to {store}",
+  "orderConfirmationHeading": "We received your order",
+  "orderConfirmationBody": "Order #{number} is recorded. If you chose manual payment, follow the instructions below.",
+  "paymentConfirmedHeading": "Your payment is confirmed",
+  "paymentConfirmedBody": "We are preparing order #{number}.",
+  "pickupHeading": "Your order is ready for pickup",
+  "shippedHeading": "Your order is on its way",
+  "pickupBody": "You can now pick up order #{number}.",
+  "shippedBody": "We shipped order #{number}. You can see the details below.",
+  "newOrderHeading": "A new order arrived",
+  "newOrderBody": "Review order #{number} to prepare the next step.",
+  "teamInvitationHeading": "Join the team",
+  "teamInvitationBody": "Accept the invitation to help manage the store.",
+  "viewOrder": "View my order",
+  "acceptInvite": "Accept invitation",
+  "footer": "This message was sent by {store}."
+}
