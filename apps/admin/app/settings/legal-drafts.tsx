@@ -16,7 +16,7 @@ export function LegalDrafts({ storeId, pages, labels }: { storeId: string; pages
   const existing = new Map(pages.map((page) => [page.slug, page.id]));
   return <section className="space-y-3"><h2 className="text-2xl font-semibold">{labels.title}</h2>
     <p>{labels.intro}</p>
-    <p className="rounded border border-amber-500 bg-amber-50 p-3 text-slate-900">{labels.notice}</p>
+    <p className="rounded border border-[#f5c77a] bg-[#3d3115] p-3 text-[#e9ebf2]">{labels.notice}</p>
     <ul className="space-y-2">{legalSlugs.map((slug) => <li key={slug} className="flex flex-wrap items-center justify-between gap-3 rounded border p-3">
       <span>{labels[slug].title}</span>
       {existing.has(slug) ? <a className="auth-secondary min-h-11" href={`/page/edit?store=${storeId}&page=${existing.get(slug)}`}>{labels.edit}</a>

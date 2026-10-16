@@ -25,7 +25,7 @@ export default async function ProductDetail({ params, searchParams }: { params: 
   const balance = new Map((balances.data ?? []).map((row) => [row.variant_id, row]));
   return <PanelShell context={context} active="products"><main className="space-y-5 p-4 md:p-8">
     <h1 className="text-3xl font-bold">{product.name}</h1>
-    {(variants ?? []).map((variant) => <section key={variant.id} className="space-y-3 rounded-xl border border-slate-300 p-4">
+    {(variants ?? []).map((variant) => <section key={variant.id} className="space-y-3 rounded-xl border border-[#2a2f3c] p-4">
       <h2 className="text-xl font-bold">{variant.title}</h2>
       <p>{t('products.stock')}: {balance.get(variant.id)?.on_hand ?? 0}</p>
       <StockControl storeId={storeId} variantId={variant.id} onHand={balance.get(variant.id)?.on_hand ?? 0}
@@ -33,7 +33,7 @@ export default async function ProductDetail({ params, searchParams }: { params: 
           note: t('products.note'), error: t('products.stockError') }} />
     </section>)}
     <section><h2 className="text-xl font-bold">{t('products.history')}</h2><ul className="space-y-2">
-      {(movements.data ?? []).map((item, index) => <li key={`${item.variant_id}-${item.created_at}-${index}`} className="rounded-lg border border-slate-200 p-3">
+      {(movements.data ?? []).map((item, index) => <li key={`${item.variant_id}-${item.created_at}-${index}`} className="rounded-lg border border-[#2a2f3c] p-3">
         <time dateTime={item.created_at}>{new Date(item.created_at).toLocaleDateString()}</time> · {item.delta > 0 ? '+' : ''}{item.delta} · {item.reason}
         {item.note && <p>{item.note}</p>}
       </li>)}</ul></section>

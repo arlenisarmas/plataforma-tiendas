@@ -37,7 +37,7 @@ export default async function PublishPage({ searchParams }: { searchParams: Prom
       ['published', 'missing', 'config', 'domain', 'save', 'permission', 'invalid'].includes(params.result) ? params.result : 'save'}`)}</p>}
     {published && address && <p><a className="underline" href={address} target="_blank" rel="noreferrer">{address}</a></p>}
     <form action={publishStore}><input type="hidden" name="storeId" value={context.selected.id} />
-      <button className="min-h-11 rounded bg-slate-900 px-6 text-white disabled:opacity-50"
+      <button className="min-h-11 rounded bg-[#5b5fe0] px-6 text-white disabled:opacity-50"
         disabled={!canPublish(checks)}>{published ? t('publishStore.update') : t('publishStore.open')}</button></form>
     {!canPublish(checks) && <p>{t('publishStore.missingHelp')}</p>}
   </main></PanelShell>;

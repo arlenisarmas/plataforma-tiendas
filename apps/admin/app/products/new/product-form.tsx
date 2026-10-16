@@ -56,7 +56,7 @@ export function ProductForm({ storeId, categories, labels, media }: { storeId: s
     {media}
     <label className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={advanced}
       onChange={(event) => setAdvanced(event.target.checked)} />{labels.advanced}</label>
-    {advanced && <div className="space-y-4 rounded-xl border border-slate-300 p-4">
+    {advanced && <div className="space-y-4 rounded-xl border border-[#2a2f3c] p-4">
       <label className="block font-semibold">{labels.slug}<input className="auth-input" value={slug}
         onChange={(event) => { setSlugEdited(true); setSlug(event.target.value.toLowerCase()); }} /></label>
       <label className="block font-semibold">{labels.compare}<input className="auth-input" name="compare" inputMode="decimal" /></label>
@@ -68,13 +68,13 @@ export function ProductForm({ storeId, categories, labels, media }: { storeId: s
       <label className="block font-semibold">{labels.optionValues}<input className="auth-input" value={optionValues}
         onChange={(event) => setOptionValues(event.target.value)} /></label>
       {options.length > 0 && optionName && <div className="space-y-3">{options.map((value) =>
-        <div key={value} className="rounded-lg border border-slate-200 p-3"><strong>{value}</strong>
+        <div key={value} className="rounded-lg border border-[#2a2f3c] p-3"><strong>{value}</strong>
           <label className="block font-semibold">{labels.price}<input className="auth-input" inputMode="decimal"
             value={variantPrices[value] ?? price} onChange={(event) => setVariantPrices((current) => ({ ...current, [value]: event.target.value }))} /></label>
           <label className="block font-semibold">{labels.stock}<input className="auth-input" type="number" min="0" max="1000000"
             value={variantStocks[value] ?? stock} onChange={(event) => setVariantStocks((current) => ({ ...current, [value]: event.target.value }))} /></label></div>)}</div>}
     </div>}
-    {error && <p className="text-red-700" role="alert">{error}</p>}
+    {error && <p className="text-[#ff9aa5]" role="alert">{error}</p>}
     <div className="flex flex-wrap gap-3"><button className="auth-secondary" type="submit" disabled={pending}>{labels.saveDraft}</button>
       <button className="auth-primary" type="button" disabled={pending} onClick={(event) => {
         const form = event.currentTarget.closest('form'); if (form?.reportValidity()) submit(form, 'active');

@@ -95,7 +95,7 @@ export function BlockEditor({ storeId, pageId, initial, assets, products, catego
       <button type="button" className="auth-secondary" disabled={!state.future.length} onClick={() => history('redo')}>{labels.redo}</button>
       <button type="button" className="auth-primary" disabled={status !== 'saved' || publishing} onClick={() => void publish()}>{labels.publish}</button>
     </div>
-    {publication && <p role="status" className="rounded-lg bg-green-50 p-3">{publication}</p>}
+    {publication && <p role="status" className="rounded-lg bg-[#173b2e] p-3">{publication}</p>}
     <div className="grid gap-4 md:grid-cols-[minmax(13rem,1fr)_minmax(18rem,1.4fr)_minmax(18rem,1.5fr)]">
       <section className={`${mobileStep !== 'list' ? 'hidden md:block' : ''} space-y-3`}>
         <h2 className="text-xl font-semibold">{labels.sections}</h2>
@@ -133,7 +133,7 @@ export function BlockEditor({ storeId, pageId, initial, assets, products, catego
         {chosen && definition && <><h2 className="text-xl font-semibold">{dictionary[definition.i18n.name.replace(/^blocks\./, '')]}</h2>
           <button type="button" className="auth-secondary" onClick={() => setDesign(!design)}>{labels.design}</button>
           {design && <div className="grid grid-cols-2 gap-2">{definition.variants.map((variant) => <button type="button"
-            key={variant.id} aria-pressed={chosen.variant === variant.id} className="min-h-24 rounded border-2 p-2 aria-pressed:border-sky-700"
+            key={variant.id} aria-pressed={chosen.variant === variant.id} className="min-h-24 rounded border-2 p-2 aria-pressed:border-[#8c90ff]"
             onMouseEnter={() => sendPreview(state.present.map((block) => block.id === chosen.id ? { ...block, variant: variant.id } : block))}
             onMouseLeave={() => sendPreview(state.present)}
             onClick={() => update(chosen.id, (block) => ({ ...block, variant: variant.id }))}>

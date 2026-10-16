@@ -26,6 +26,6 @@ export function StockControl({ storeId, variantId, onHand, labels }: { storeId: 
       onClick={() => save('add')}>{labels.add}</button>
       <button type="button" className="auth-secondary" disabled={pending || !amount || Number(amount) === onHand}
         onClick={() => save('correct')}>{labels.correct}</button></div>
-    {error && <p role="alert" className="text-red-700">{error}</p>}
+    {error && <p role="alert" className="text-[#ff9aa5]">{error}</p>}
   </div>;
 }
