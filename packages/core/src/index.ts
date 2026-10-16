@@ -3,3 +3,4 @@ export * from './slug';
 export * from './orders';
 export * from './errors';
 export * from './sanitize';
+export * from './rate-limit';

@@ -4,6 +4,7 @@ const { panelContext, renderEmail, sendWithRetry } = vi.hoisted(() => ({
   panelContext: vi.fn(), renderEmail: vi.fn(), sendWithRetry: vi.fn(),
 }));
 vi.mock('../../../lib/panel-data', () => ({ panelContext }));
+vi.mock('../../../lib/action-rate-limit', () => ({ allowAction: vi.fn().mockResolvedValue(true) }));
 vi.mock('../../../lib/locale', () => ({ adminLocale: async () => 'es-AR' }));
 vi.mock('@plataforma/emails', () => ({ createEmailSender: () => ({ send: vi.fn() }), renderEmail, sendWithRetry }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));

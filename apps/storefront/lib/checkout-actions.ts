@@ -3,7 +3,7 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { headers } from 'next/headers';
 import { z } from 'zod';
-import { calculateTotals, CURRENCY_EXPONENTS, type CurrencyCode } from '@plataforma/core';
+import { calculateTotals, CURRENCY_EXPONENTS, MemoryRateLimiter, type CurrencyCode } from '@plataforma/core';
 // eslint-disable-next-line boundaries/dependencies -- guest checkout requires the server-only service role
 import { createServiceClient } from '@plataforma/db/server';
 import { ManualProvider, MercadoPagoProvider, type CheckoutResult } from '@plataforma/payments';
@@ -18,22 +18,14 @@ type CheckoutError = 'invalid' | 'empty' | 'unavailable' | 'stock' | 'rate' | 'p
 export type CheckoutResponse = { ok: true; orderId: string; token: string; checkout: CheckoutResult } |
   { ok: false; error: CheckoutError; product?: string };
 
-const attempts = new Map<string, { count: number; until: number }>();
-function allowed(key: string, now = Date.now()) {
-  if (attempts.size > 5000) for (const [id, value] of attempts) if (value.until <= now) attempts.delete(id);
-  const current = attempts.get(key);
-  if (!current || current.until <= now) { attempts.set(key, { count: 1, until: now + 600_000 }); return true; }
-  if (current.count >= 5) return false;
-  current.count++;
-  return true;
-}
+const limiter = new MemoryRateLimiter();
 
 export async function placeOrder(raw: unknown): Promise<CheckoutResponse> {
   const input = inputSchema.safeParse(raw);
   if (!input.success) return { ok: false, error: 'invalid' };
   const requestHeaders = await headers();
   const ip = requestHeaders.get('x-real-ip') ?? requestHeaders.get('x-forwarded-for')?.split(',')[0] ?? input.data.email;
-  if (!allowed(`${input.data.storeId}:${ip}`)) return { ok: false, error: 'rate' };
+  if (!limiter.consume(`${input.data.storeId}:${ip}`, 5, 600_000)) return { ok: false, error: 'rate' };
   const cart = await currentCart(input.data.storeId);
   if (!cart.items.length) return { ok: false, error: 'empty' };
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
