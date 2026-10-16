@@ -9,7 +9,7 @@ type Labels = Record<'name' | 'description' | 'price' | 'stock' | 'category' | '
   'saveDraft' | 'publish' | 'advanced' | 'slug' | 'variantName' | 'optionName' | 'optionValues' |
   'compare' | 'cost' | 'sku' | 'weight' | 'addOption' | 'saveError', string>;
 
-export function ProductForm({ storeId, categories, labels, media }: { storeId: string;
+export function ProductForm({ storeId, categories, labels, media, afterSaveHref }: { storeId: string; afterSaveHref?: string;
   categories: { id: string; name: string }[]; labels: Labels; media: ReactNode }) {
   const router = useRouter();
   const [advanced, setAdvanced] = useState(false);
@@ -39,7 +39,7 @@ export function ProductForm({ storeId, categories, labels, media }: { storeId: s
         categoryId: String(form.get('category') ?? '') || undefined,
         assetId: String(form.get('assetId') ?? '') || undefined, status, variants }).catch(() => ({ error: 'save' }));
       if (result.error) { setError(labels.saveError); return; }
-      router.push(`/products?store=${storeId}&saved=1`);
+      router.push(afterSaveHref ?? `/products?store=${storeId}&saved=1`);
     });
   };
   return <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); submit(event.currentTarget, 'draft'); }}>

@@ -10,7 +10,8 @@ import { createDomain, findDomain } from '../../lib/domain-admin';
 export async function publishStore(form: FormData) {
   const storeId = z.uuid().safeParse(form.get('storeId'));
   if (!storeId.success) redirect('/publish?result=invalid');
-  const href = `/publish?store=${storeId.data}`;
+  // Desde el recorrido guiado (T-038) se vuelve al último paso; si no, a la pantalla de publicación.
+  const href = form.get('from') === 'build' ? `/build?step=open&store=${storeId.data}` : `/publish?store=${storeId.data}`;
   const context = await panelContext(storeId.data);
   if (context.selected.id !== storeId.data) redirect(`${href}&result=permission`);
   const { data: owner, error: ownerError } = await context.client.from('store_members').select('role')
