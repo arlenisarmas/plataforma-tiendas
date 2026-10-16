@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { StoreLayout, createTheme, themeSchema } from '@plataforma/blocks';
 import { readStorefront, storeSchema } from '../../../lib/storefront-data';
 import { catalogLabels } from '../../../lib/catalog-ui';
+import { z } from 'zod';
 
 export default async function SiteLayout({ children, params }: { children: ReactNode; params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
@@ -14,7 +15,14 @@ export default async function SiteLayout({ children, params }: { children: React
   const host = (await headers()).get('host')?.replace(/:\d+$/, '');
   const homeHref = host === 'localhost' || host === '127.0.0.1' ? `/?tienda=${store.slug}` : '/';
   const labels = catalogLabels(store.default_locale);
+  const navigation = await readStorefront('pages', z.object({ id: z.uuid(), slug: z.string(), title: z.string(),
+    show_in_nav: z.boolean(), nav_position: z.number() }), { store_id: `eq.${storeId}`, show_in_nav: 'eq.true',
+    order: 'nav_position.asc' }, [`store:${storeId}`]);
   return <StoreLayout theme={theme.success ? theme.data : createTheme()} storeName={store.name} homeHref={homeHref}>
+    <nav className="mx-auto flex max-w-6xl flex-wrap gap-3 px-4 py-2" aria-label={labels.nav}>
+      {navigation.map((page) => <a key={page.id} href={page.slug ? `/${page.slug}` : homeHref}
+        className="min-h-11 rounded px-2 py-3 underline">{page.title}</a>)}
+    </nav>
     <form action="/buscar" className="mx-auto flex max-w-6xl gap-2 p-4" role="search">
       <input name="q" aria-label={labels.search} placeholder={labels.search} className="min-h-11 min-w-0 flex-1 rounded border p-3" />
       <button className="min-h-11 rounded bg-slate-900 px-4 text-white">{labels.searchButton}</button>
