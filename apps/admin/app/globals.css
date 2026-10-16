@@ -1,3 +1,9 @@
 @import 'tailwindcss';
 @import '@plataforma/ui/tokens.css';
 @config "../../../packages/config/tailwind.mjs";
+.auth-input { display: block; width: 100%; min-height: 44px; margin-top: .5rem; padding: .5rem; border: 1px solid #475569; border-radius: .5rem; background: white; }
+.auth-primary, .auth-secondary { display: inline-flex; min-height: 44px; min-width: 9rem; align-items: center; justify-content: center; padding: .5rem 1rem; border-radius: .5rem; font-weight: 700; }
+.auth-primary { background: #07567a; color: white; }
+.auth-secondary { border: 1px solid #07567a; color: #07567a; }
+a { text-decoration: underline; }
+:focus-visible { outline: 3px solid #07567a; outline-offset: 3px; }
