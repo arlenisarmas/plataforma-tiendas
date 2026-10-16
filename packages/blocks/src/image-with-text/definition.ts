@@ -8,6 +8,7 @@ export const imageWithTextDefinition = {
   schema: imageWithTextSchema, defaults: { title: '', body: '', image: { assetId: '00000000-0000-4000-8000-000000000000', alt: '' } },
   fields: [titleField, { name: 'body', kind: 'textarea', i18n: { label: 'blocks.richTextBody' }, simple: true },
     { name: 'image', kind: 'image', i18n: { label: 'blocks.heroImage' }, simple: true },
-    { name: 'button.label', kind: 'text', i18n: { label: 'blocks.announcementButton' }, simple: false }],
+    { name: 'button.label', kind: 'text', i18n: { label: 'blocks.announcementButton' }, simple: false },
+    { name: 'button.href', kind: 'link', i18n: { label: 'blocks.link' }, simple: false }],
   variants: contentVariants('imageWithText', ['left', 'right', 'overlay']), defaultVariant: 'left', Component: ImageWithText,
 } satisfies BlockDefinition<typeof imageWithTextSchema>;
