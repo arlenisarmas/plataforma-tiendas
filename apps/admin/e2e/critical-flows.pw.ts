@@ -1,7 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
-const photo = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a+t8AAAAASUVORK5CYII=', 'base64');
+// Valid 1x1 PNG (the browser must be able to decode it to compress it).
+const photo = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+
+// Next.js renders an empty role="alert" route announcer; only alerts with text are errors.
+const errorAlert = (page: Page) => page.getByRole('alert').filter({ hasText: /\S/ });
 
 async function audit(page: Page) {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
@@ -51,9 +55,9 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.getByLabel('Unidades disponibles').fill('5');
     await page.getByLabel('Subir imagen').setInputFiles({ name: 'foto.png', mimeType: 'image/png', buffer: photo });
     await page.locator('button', { hasText: 'Subir imagen' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Imagen elegida.' }).or(page.getByRole('alert')))
+    await expect(page.getByRole('status').filter({ hasText: 'Imagen elegida.' }).or(errorAlert(page)))
       .toBeVisible({ timeout: 30_000 });
-    await expect(page.getByRole('alert')).toHaveCount(0);
+    await expect(errorAlert(page)).toHaveCount(0);
     await page.getByRole('button', { name: 'Guardar y publicar' }).click();
     await expect(page.getByText('Producto guardado.')).toBeVisible();
     await audit(page);
@@ -65,9 +69,9 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.getByLabel('Título', { exact: true }).fill('Portada de prueba');
     await page.getByLabel('Subir imagen').setInputFiles({ name: 'portada.png', mimeType: 'image/png', buffer: photo });
     await page.locator('button', { hasText: 'Subir imagen' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Guardado' }).or(page.getByRole('alert')))
+    await expect(page.getByRole('status').filter({ hasText: 'Guardado' }).or(errorAlert(page)))
       .toBeVisible({ timeout: 30_000 });
-    await expect(page.getByRole('alert')).toHaveCount(0);
+    await expect(errorAlert(page)).toHaveCount(0);
     await page.getByRole('button', { name: 'Publicar', exact: true }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Tus cambios ya están en tu tienda' })).toBeVisible();
     await audit(page);
