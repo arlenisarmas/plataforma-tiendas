@@ -11,7 +11,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const items = [
     { key: 'logo', href: `/page?store=${selected}` }, { key: 'product', href: `/products?store=${selected}` },
     { key: 'payment', href: `/settings?store=${selected}` }, { key: 'shipping', href: `/settings?store=${selected}` },
-    { key: 'page', href: `/page?store=${selected}` }, { key: 'publish', href: `/page?store=${selected}` },
+    { key: 'page', href: `/page?store=${selected}` }, { key: 'publish', href: `/publish?store=${selected}` },
   ] as const;
   return <PanelShell context={data} active="home">
     <main className="space-y-6 p-4 md:p-8">
