@@ -8,7 +8,7 @@ import { reconcileCart, setCartQuantity } from '../../../../lib/cart-actions';
 
 type Line = { productId: string; variantId: string; name: string; slug: string; option: string;
   quantity: number; price: bigint };
-type Labels = { quantity: string; remove: string; total: string; empty: string; continueShopping: string };
+type Labels = { quantity: string; remove: string; total: string; empty: string; continueShopping: string; checkout: string };
 
 export function CartLines({ storeId, storeSlug, lines, currency, locale, labels, changed }: {
   storeId: string; storeSlug: string; lines: Line[]; currency: CurrencyCode; locale: string; labels: Labels; changed: boolean;
@@ -34,5 +34,7 @@ export function CartLines({ storeId, storeSlug, lines, currency, locale, labels,
           .map((quantity) => <option key={quantity} value={quantity}>{quantity}</option>)}</select>
       <button type="button" onClick={() => void update(line.variantId, 0)} disabled={pending === line.variantId}
         className="min-h-11 rounded px-2 underline">{labels.remove}</button></div>
-  </li>)}</ul><p className="mt-6 text-xl font-semibold">{labels.total}: {formatMoney({ amount: total, currency }, locale)}</p></>;
+  </li>)}</ul><p className="mt-6 text-xl font-semibold">{labels.total}: {formatMoney({ amount: total, currency }, locale)}</p>
+    <Link href={`/finalizar?tienda=${storeSlug}`} className="mt-5 inline-flex min-h-11 items-center rounded bg-black px-5 text-white">
+      {labels.checkout}</Link></>;
 }
