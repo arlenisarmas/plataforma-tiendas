@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { userClient } from '../lib/server-client';
 import { chooseGuide, saveProfile, sendMagicLink, sendPasswordReset, signIn, signUp } from '../lib/auth-service';
+import { allowAction } from '../lib/action-rate-limit';
 
 function origin() { return process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001'; }
 function fields(form: FormData) { return Object.fromEntries(form.entries()); }
@@ -15,6 +16,7 @@ function safeInvitationPath(value: FormDataEntryValue | null): string | null {
 }
 
 export async function loginAction(form: FormData) {
+  if (!await allowAction('login', 5, 600_000)) authError();
   const client = await userClient();
   const result = await signIn(client, fields(form)).catch(authError);
   if (result.error) authError();
@@ -29,12 +31,14 @@ export async function loginAction(form: FormData) {
 }
 
 export async function signupAction(form: FormData) {
+  if (!await allowAction('signup', 3, 600_000)) authError();
   const result = await signUp(await userClient(), fields(form), `${origin()}/auth/callback?first=1`).catch(authError);
   if (result.error) authError();
   redirect(result.data.session ? '/welcome' : '/login?sent=1');
 }
 
 export async function magicAction(form: FormData) {
+  if (!await allowAction('magic-link', 3, 600_000)) authError();
   const next = safeInvitationPath(form.get('next'));
   const callback = new URL(`${origin()}/auth/callback`);
   if (next) callback.searchParams.set('next', next);
@@ -44,6 +48,7 @@ export async function magicAction(form: FormData) {
 }
 
 export async function forgotAction(form: FormData) {
+  if (!await allowAction('password-reset', 3, 600_000)) authError();
   await sendPasswordReset(await userClient(), fields(form), `${origin()}/auth/callback?next=/reset/new`).catch(authError);
   redirect('/login?sent=1');
 }

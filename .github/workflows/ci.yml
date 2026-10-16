@@ -53,3 +53,17 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+
+  lighthouse:
+    name: Lighthouse (tienda publicada)
+    if: ${{ vars.LIGHTHOUSE_URL != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Medir rendimiento y accesibilidad
+        env:
+          LIGHTHOUSE_URL: ${{ vars.LIGHTHOUSE_URL }}
+        run: npx --yes @lhci/cli@0.15.1 autorun --collect.url="$LIGHTHOUSE_URL"

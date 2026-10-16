@@ -9,6 +9,7 @@ import { messages } from '@plataforma/i18n';
 import { adminLocale } from '../../../lib/locale';
 import { panelContext } from '../../../lib/panel-data';
 import { userClient } from '../../../lib/server-client';
+import { allowAction } from '../../../lib/action-rate-limit';
 
 const store = z.object({ storeId: z.uuid() });
 
@@ -21,6 +22,7 @@ async function ownerContext(storeId: string) {
 }
 
 export async function inviteMember(raw: unknown) {
+  if (!await allowAction('invite', 10, 600_000)) return { error: 'rate' as const };
   const input = store.extend({ email: z.email(), role: z.enum(['owner', 'staff']) }).safeParse(raw);
   if (!input.success) return { error: 'invalid' as const };
   const context = await ownerContext(input.data.storeId);
