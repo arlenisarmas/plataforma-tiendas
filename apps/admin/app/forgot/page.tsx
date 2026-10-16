@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { AuthShell } from '../auth-shell';
 import { forgotAction } from '../auth-actions';
 import { adminText } from '../../lib/locale';
@@ -11,4 +12,3 @@ export default async function ForgotPage() {
     </form><Link href="/login">{t('backToLogin')}</Link>
   </AuthShell>;
 }
-import Link from 'next/link';

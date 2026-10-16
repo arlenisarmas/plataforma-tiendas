@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { AuthShell } from '../auth-shell';
 import { loginAction, magicAction } from '../auth-actions';
 import { adminText } from '../../lib/locale';
@@ -21,4 +22,3 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <nav className="flex flex-wrap gap-4"><Link href="/signup">{t('signUp')}</Link><Link href="/forgot">{t('forgotPassword')}</Link></nav>
   </AuthShell>;
 }
-import Link from 'next/link';
