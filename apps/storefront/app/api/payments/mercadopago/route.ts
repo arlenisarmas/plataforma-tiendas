@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { CURRENCY_EXPONENTS, toMinor, type CurrencyCode } from '@plataforma/core';
 // eslint-disable-next-line boundaries/dependencies -- server-only public export
 import { createServiceClient } from '@plataforma/db/server';
 import { MercadoPagoProvider, readMercadoPagoNotification, verifyMercadoPagoSignature } from '@plataforma/payments';
+import { sendPaymentConfirmedEmail } from '../../../../lib/order-emails';
 
 const currencySchema = z.enum(Object.keys(CURRENCY_EXPONENTS) as [CurrencyCode, ...CurrencyCode[]]);
 
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
   if (!event || event.collectorId !== accountId) return NextResponse.json({ error: 'invalid payment' }, { status: 400 });
 
   const { data: payment } = await client.from('payments')
-    .select('id,store_id,payment_method_id,amount,currency,provider').eq('id', event.paymentId).maybeSingle();
+    .select('id,store_id,order_id,payment_method_id,amount,currency,provider').eq('id', event.paymentId).maybeSingle();
   const currency = currencySchema.safeParse(event.currency);
   let amountMatches = false;
   try { amountMatches = currency.success && Number.isSafeInteger(payment?.amount) &&
@@ -63,5 +64,7 @@ export async function POST(request: Request) {
   if (applied.error) return NextResponse.json({ error: 'retry' }, { status: 500 });
   await client.from('payment_events').update({ processed_at: new Date().toISOString(), error: null })
     .eq('provider', 'mercadopago').eq('provider_event_id', event.providerEventId);
+  if (event.status === 'approved')
+    after(() => sendPaymentConfirmedEmail(client, payment.store_id, payment.order_id));
   return NextResponse.json({ ok: true });
 }

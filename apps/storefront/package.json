@@ -16,6 +16,7 @@
     "@plataforma/blocks": "workspace:*",
     "@plataforma/core": "workspace:*",
     "@plataforma/db": "workspace:*",
+    "@plataforma/emails": "workspace:*",
     "@plataforma/i18n": "workspace:*",
     "@plataforma/payments": "workspace:*",
     "@sentry/nextjs": "^11.7.0",
