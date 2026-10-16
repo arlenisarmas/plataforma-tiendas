@@ -35,3 +35,14 @@ Contraseña de ambos: `demo1234`
 - `database.types.ts` es generado: no se edita a mano ni se formatea con Prettier.
 - Staging se migra solo al integrar en `main` (workflow *Base de datos staging*), cuando estén
   cargados los secretos `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` y `SUPABASE_DB_PASSWORD`.
+
+## Acceso solo por invitación (T-035)
+
+- Nadie se registra solo: `/signup` muestra un aviso y las cuentas se crean al aceptar una invitación
+  (`/join/<token>` para invitaciones de plataforma, `/invite/<token>` para ayudantes de una tienda).
+- La cuenta se crea en el servidor con el email ya confirmado (el enlace llegó a ese correo), usando
+  `SUPABASE_SERVICE_ROLE_KEY`, que el panel necesita en sus variables de entorno.
+- En Supabase conviene **desactivar el registro abierto** para que tampoco se pueda crear una cuenta por la API:
+  Authentication → Sign In / Providers → «Allow new users to sign up» = apagado. Las invitaciones siguen
+  funcionando porque crean la cuenta con la clave de servidor.
+- Una persona pausada desde la consola pierde acceso a sus tiendas (RLS) y al entrar ve «Tu acceso está pausado».
