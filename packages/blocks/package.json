@@ -18,6 +18,7 @@
     "@plataforma/config": "workspace:*",
     "@plataforma/i18n": "workspace:*",
     "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
     "@types/react": "19.2.0",
     "@types/react-dom": "19.2.0",
     "react": "19.3.1",
@@ -28,6 +29,8 @@
     "react-dom": "19.3.1"
   },
   "dependencies": {
+    "@plataforma/core": "workspace:*",
+    "@plataforma/i18n": "workspace:*",
     "zod": "4.6.7"
   }
 }
