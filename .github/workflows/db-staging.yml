@@ -42,5 +42,9 @@ jobs:
       - name: Aplicar migraciones
         if: steps.secretos.outputs.listo == 'true'
         run: |
-          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
-          supabase db push --password "$SUPABASE_DB_PASSWORD"
+          # Si algo falla, el motivo queda como anotación del job (los secretos se enmascaran solos).
+          set -o pipefail
+          fallo() { echo "::error title=$1::$(tail -15 salida.txt | tr '\n' ' ' | cut -c1-900)"; exit 1; }
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD" 2>&1 | tee salida.txt || fallo "supabase link"
+          supabase db push --password "$SUPABASE_DB_PASSWORD" 2>&1 | tee salida.txt || fallo "supabase db push"
+          echo "::notice title=Staging::Migraciones aplicadas"
