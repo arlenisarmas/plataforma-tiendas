@@ -686,6 +686,9 @@ isOneToOne: false
 "check_store_slug":
 { Args: { "p_slug": string }; Returns: string
                            },
+"clear_payment_secret":
+{ Args: { "p_method_id": string }; Returns: undefined
+                           },
 "commit_reservation":
 { Args: { "p_order_id": string }; Returns: undefined
                            },
@@ -702,13 +705,7 @@ isOneToOne: false
 { Args: { "p_order_id": string,"p_token": string }; Returns: Json
                            },
 "get_payment_secret":
-{ Args: { "p_method_id": string }; Returns: string | null
-                           },
-"set_payment_secret":
-{ Args: { "p_method_id": string,"p_secret": string }; Returns: undefined
-                           },
-"clear_payment_secret":
-{ Args: { "p_method_id": string }; Returns: undefined
+{ Args: { "p_method_id": string }; Returns: string
                            },
 "is_platform_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -745,6 +742,9 @@ isOneToOne: false
                            },
 "restore_page_version":
 { Args: { "p_page_id": string,"p_version_id": string }; Returns: undefined
+                           },
+"set_payment_secret":
+{ Args: { "p_method_id": string,"p_secret": string }; Returns: undefined
                            },
 "try_uuid":
 { Args: { "p_value": string }; Returns: string
