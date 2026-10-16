@@ -193,6 +193,6 @@ y textos de ejemplo editables. El asistente de creación pregunta el rubro y apl
 1. Carpeta `packages/blocks/src/<tipo>/` con `schema.ts`, `definition.ts`, `component.tsx`, `<tipo>.test.ts`.
 2. Registrar en `packages/blocks/src/registry.ts`.
 3. Textos en `packages/i18n/messages/es-419/blocks.json` (y `en`).
-4. Miniatura del catálogo en `packages/blocks/assets/<tipo>.webp`.
+4. Miniatura de cada variante como SVG embebido (`thumbnailFor` en `packages/blocks/src/thumbnail.ts`).
 5. Tests: esquema acepta `defaults`, rechaza props inválidas, el componente renderiza
    con `defaults` y en 360 px de ancho sin desbordes.

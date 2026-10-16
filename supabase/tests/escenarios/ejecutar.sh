@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Corre las migraciones y los 53 escenarios de seguridad y negocio sobre un
+# Corre las migraciones y los escenarios de seguridad y negocio sobre un
 # PostgreSQL limpio (sin Supabase). Uso: DATABASE_URL=postgres://... ./ejecutar.sh
 # La base indicada se BORRA y se recrea.
 set -euo pipefail
