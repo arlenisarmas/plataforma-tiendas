@@ -1,10 +1,11 @@
 import { Body, Button, Container, Head, Heading, Html, Img, Preview, Section, Text } from '@react-email/components';
 import { render } from '@react-email/render';
 
-export type EmailKind = 'orderConfirmation' | 'paymentConfirmed' | 'orderReady' | 'newOrder' | 'teamInvitation';
+export type EmailKind = 'orderConfirmation' | 'paymentConfirmed' | 'orderReady' | 'newOrder' | 'teamInvitation' | 'platformInvitation';
 type CopyKey = EmailKind | 'orderConfirmationHeading' | 'orderConfirmationBody' | 'paymentConfirmedHeading' |
   'paymentConfirmedBody' | 'pickupHeading' | 'shippedHeading' | 'pickupBody' | 'shippedBody' |
   'newOrderHeading' | 'newOrderBody' | 'teamInvitationHeading' | 'teamInvitationBody' |
+  'platformInvitationHeading' | 'platformInvitationBody' |
   'viewOrder' | 'acceptInvite' | 'footer';
 export type EmailCopy = Record<CopyKey, string>;
 export type EmailTemplateData = { kind: EmailKind; copy: EmailCopy; storeName: string; accentColor?: string;
@@ -18,11 +19,13 @@ export async function renderEmail(data: EmailTemplateData): Promise<{ subject: s
   const heading = data.kind === 'orderConfirmation' ? copy.orderConfirmationHeading :
     data.kind === 'paymentConfirmed' ? copy.paymentConfirmedHeading :
     data.kind === 'orderReady' ? (data.pickup ? copy.pickupHeading : copy.shippedHeading) :
-    data.kind === 'newOrder' ? copy.newOrderHeading : copy.teamInvitationHeading;
+    data.kind === 'newOrder' ? copy.newOrderHeading :
+    data.kind === 'platformInvitation' ? copy.platformInvitationHeading : copy.teamInvitationHeading;
   const body = data.kind === 'orderConfirmation' ? copy.orderConfirmationBody :
     data.kind === 'paymentConfirmed' ? copy.paymentConfirmedBody :
     data.kind === 'orderReady' ? (data.pickup ? copy.pickupBody : copy.shippedBody) :
-    data.kind === 'newOrder' ? copy.newOrderBody : copy.teamInvitationBody;
+    data.kind === 'newOrder' ? copy.newOrderBody :
+    data.kind === 'platformInvitation' ? copy.platformInvitationBody : copy.teamInvitationBody;
   const color = /^#[0-9a-fA-F]{6}$/.test(data.accentColor ?? '') ? data.accentColor : '#07567a';
   const html = await render(<Html><Head /><Preview>{subject}</Preview>
     <Body style={{ backgroundColor: '#f5f7fa', fontFamily: 'Arial,sans-serif', margin: 0, padding: '24px 12px' }}>

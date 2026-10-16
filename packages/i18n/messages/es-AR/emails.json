@@ -18,5 +18,8 @@
   "teamInvitationBody": "Aceptá la invitación para ayudar a gestionar la tienda.",
   "viewOrder": "Ver mi pedido",
   "acceptInvite": "Aceptar invitación",
-  "footer": "Este mensaje lo envió {store}."
+  "footer": "Este mensaje lo envió {store}.",
+  "platformInvitation": "Te invitaron a {store}",
+  "platformInvitationHeading": "Te invitaron",
+  "platformInvitationBody": "Elegí tu contraseña y empezá a armar tu tienda: portada, productos y colores, todo desde el celular o la compu."
 }

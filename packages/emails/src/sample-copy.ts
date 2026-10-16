@@ -19,5 +19,8 @@ export const sampleCopy: EmailCopy = {
   newOrderBody: 'Revisá el pedido #{number}.',
   teamInvitationHeading: 'Te sumaron al equipo',
   teamInvitationBody: 'Aceptá la invitación para ayudar a gestionar la tienda.',
+  platformInvitation: 'Te invitaron a {store}',
+  platformInvitationHeading: 'Te invitaron',
+  platformInvitationBody: 'Elegí tu contraseña y empezá a armar tu tienda: portada, productos y colores, todo desde el celular o la compu.',
   viewOrder: 'Ver mi pedido', acceptInvite: 'Aceptar invitación', footer: 'Este mensaje lo envió {store}.',
 };

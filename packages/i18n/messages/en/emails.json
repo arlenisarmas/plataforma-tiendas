@@ -18,5 +18,8 @@
   "teamInvitationBody": "Accept the invitation to help manage the store.",
   "viewOrder": "View my order",
   "acceptInvite": "Accept invitation",
-  "footer": "This message was sent by {store}."
+  "footer": "This message was sent by {store}.",
+  "platformInvitation": "You're invited to {store}",
+  "platformInvitationHeading": "You're invited",
+  "platformInvitationBody": "Choose your password and start building your store: home page, products and colors, all from your phone or computer."
 }
