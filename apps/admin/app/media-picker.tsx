@@ -35,7 +35,7 @@ export function MediaPicker({ storeId, folder, initial, labels, name = 'assetId'
     } catch { setError(labels.invalid); }
   });
   return <div className="space-y-4">
-    <div className="rounded-xl border border-slate-300 p-4">
+    <div className="rounded-xl border border-[#2a2f3c] p-4">
       <label className="block font-semibold" htmlFor={fileId}>{labels.upload}</label>
       <input id={fileId} className="auth-input" type="file" accept="image/*"
         onChange={(event) => { const next = event.target.files?.[0]; setFile(next); setAlt(next?.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') ?? ''); setError(''); }} />
@@ -44,13 +44,13 @@ export function MediaPicker({ storeId, folder, initial, labels, name = 'assetId'
       <input id={altId} className="auth-input" value={alt} maxLength={300} placeholder={labels.suggestion}
         onChange={(event) => setAlt(event.target.value)} />
       <button className="auth-primary mt-4" type="button" disabled={pending} onClick={submit}>{labels.upload}</button>
-      {error && <p className="mt-2 text-red-700" role="alert">{error}</p>}
+      {error && <p className="mt-2 text-[#ff9aa5]" role="alert">{error}</p>}
     </div>
     <div aria-label={labels.choose} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {assets.length === 0 && <p>{labels.empty}</p>}
       {assets.map((asset) => <button key={asset.id} type="button" aria-label={`${labels.choose}: ${asset.alt_text ?? asset.path}`}
         aria-pressed={selected === asset.id} onClick={() => choose(asset)}
-        className="min-h-24 overflow-hidden rounded-lg border-2 border-slate-300 aria-pressed:border-sky-700">
+        className="min-h-24 overflow-hidden rounded-lg border-2 border-[#2a2f3c] aria-pressed:border-[#8c90ff]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img alt={asset.alt_text ?? ''} className="aspect-square w-full object-cover" loading="lazy"
           src={`${base}/storage/v1/object/public/store-media/${asset.path.split('/').map(encodeURIComponent).join('/')}`} />

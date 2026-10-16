@@ -44,6 +44,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@fontsource-variable/plus-jakarta-sans':
+        specifier: 5.2.8
+        version: 5.2.8
       '@plataforma/blocks':
         specifier: workspace:*
         version: link:../../packages/blocks
@@ -697,6 +700,9 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fontsource-variable/plus-jakarta-sans@5.2.8':
+    resolution: {integrity: sha512-iQecBizIdZxezODNHzOn4SvvRMrZL/S8k4MEXGDynCmUrImVW0VmX+tIAMqnADwH4haXlHSXqMgU6+kcfBQJdw==}
 
   '@formatjs/fast-memoize@3.1.7':
     resolution: {integrity: sha512-zXfhLpvA6T7+efdt9JLbBwZ00tT7NsBMDVnDu8rpHeNNv8KfRZAMo2gkG0k9lK/Nzc//3kJ9pImsfuJxk3KhUA==}
@@ -4858,6 +4864,8 @@ snapshots:
       levn: 0.4.1
 
   '@exodus/bytes@1.16.0': {}
+
+  '@fontsource-variable/plus-jakarta-sans@5.2.8': {}
 
   '@formatjs/fast-memoize@3.1.7': {}
 

@@ -6,16 +6,26 @@
   --ui-space-4: 1rem;
   --ui-space-6: 1.5rem;
   --ui-radius: 0.75rem;
-  --ui-background: #ffffff;
-  --ui-foreground: #172b36;
-  --ui-muted: #425466;
-  --ui-border: #77838d;
-  --ui-primary: #07567a;
+  --ui-font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --ui-background: #171a23;
+  --ui-foreground: #e9ebf2;
+  --ui-muted: #a3a9b8;
+  --ui-border: #3a3f55;
+  --ui-primary: #5b5fe0;
   --ui-primary-foreground: #ffffff;
-  --ui-danger: #a01d32;
+  --ui-danger: #c23a4b;
   --ui-danger-foreground: #ffffff;
-  --ui-surface: #f3f7f9;
-  --ui-focus: #ce7900;
+  --ui-surface: #13161e;
+  --ui-page: #0e1016;
+  --ui-line: #232733;
+  --ui-selected: #232850;
+  --ui-link: #afb4ff;
+  --ui-success: #7ee2b3;
+  --ui-success-bg: #173b2e;
+  --ui-warning: #f5c77a;
+  --ui-warning-bg: #3d3115;
+  --ui-danger-text: #ff9aa5;
+  --ui-focus: #f5c77a;
 }
 [data-text-scale='100'] {
   --ui-font-size: 16px;
@@ -37,6 +47,7 @@
 }
 .ui-root {
   color: var(--ui-foreground);
+  font-family: var(--ui-font-family);
   font-size: var(--ui-font-size);
   line-height: 1.5;
 }
@@ -72,9 +83,9 @@
   color: var(--ui-primary-foreground);
 }
 .ui-button[data-variant='secondary'] {
-  background: var(--ui-background);
-  color: var(--ui-primary);
-  border-color: var(--ui-primary);
+  background: transparent;
+  color: var(--ui-foreground);
+  border-color: var(--ui-border);
 }
 .ui-button[data-variant='danger'] {
   background: var(--ui-danger);
@@ -92,7 +103,7 @@
   color: var(--ui-muted);
 }
 .ui-error {
-  color: var(--ui-danger);
+  color: var(--ui-danger-text);
   font-weight: 600;
 }
 .ui-control {
@@ -150,7 +161,7 @@
   border-radius: var(--ui-radius);
 }
 .ui-skeleton {
-  background: linear-gradient(90deg, #e3eaee, #f5f8f9, #e3eaee);
+  background: linear-gradient(90deg, #1d212c, #262a36, #1d212c);
   background-size: 200% 100%;
   border-radius: var(--ui-radius);
   animation: ui-shimmer 1.6s linear infinite;
@@ -171,7 +182,7 @@
 .ui-dialog-overlay {
   position: fixed;
   inset: 0;
-  background: #172b36aa;
+  background: #05060acc;
   z-index: 50;
 }
 .ui-dialog-content {

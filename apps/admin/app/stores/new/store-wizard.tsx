@@ -280,9 +280,9 @@ export function StoreWizard({
               ))}
             </select>
           </label>
-          <div className="mt-3 rounded-xl border border-slate-300 p-4" aria-label={labels.preview}>
+          <div className="mt-3 rounded-xl border border-[#2a2f3c] p-4" aria-label={labels.preview}>
             <div
-              className={`h-12 rounded-lg ${palette === 'fresco' ? 'bg-sky-800' : palette === 'natural' ? 'bg-green-800' : palette === 'calido' ? 'bg-red-900' : palette === 'elegante' ? 'bg-violet-950' : 'bg-pink-900'}`}
+              className={`h-12 rounded-lg ${palette === 'fresco' ? 'bg-[#5b5fe0]' : palette === 'natural' ? 'bg-[#2f7d5b]' : palette === 'calido' ? 'bg-[#9b2c3a]' : palette === 'elegante' ? 'bg-violet-950' : 'bg-pink-900'}`}
             />
           </div>
         </div>,
@@ -307,7 +307,7 @@ export function StoreWizard({
         onComplete={complete}
       />
       {error && (
-        <p role="alert" className="text-red-700">
+        <p role="alert" className="text-[#ff9aa5]">
           {error}
         </p>
       )}

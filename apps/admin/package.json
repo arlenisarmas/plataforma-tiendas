@@ -13,6 +13,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "5.2.8",
     "@plataforma/blocks": "workspace:*",
     "@plataforma/core": "workspace:*",
     "@plataforma/db": "workspace:*",

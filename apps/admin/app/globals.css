@@ -1,9 +1,44 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/plus-jakarta-sans';
 @import '@plataforma/ui/tokens.css';
 @config "../../../packages/config/tailwind.mjs";
-.auth-input { display: block; width: 100%; min-height: 44px; margin-top: .5rem; padding: .5rem; border: 1px solid #475569; border-radius: .5rem; background: white; }
-.auth-primary, .auth-secondary { display: inline-flex; min-height: 44px; min-width: 9rem; align-items: center; justify-content: center; padding: .5rem 1rem; border-radius: .5rem; font-weight: 700; }
-.auth-primary { background: #07567a; color: white; }
-.auth-secondary { border: 1px solid #07567a; color: #07567a; }
-a { text-decoration: underline; }
-:focus-visible { outline: 3px solid #07567a; outline-offset: 3px; }
+
+/* Estilo del panel (T-037): consola oscura, tipografía Plus Jakarta Sans. */
+html { background: var(--ui-page); color-scheme: dark; }
+body { font-family: var(--ui-font-family); color: var(--ui-foreground); background: var(--ui-page); }
+h1, h2, h3 { letter-spacing: -0.02em; }
+h1 { font-weight: 800; }
+
+.auth-input {
+  display: block; width: 100%; min-height: 48px; margin-top: .5rem; padding: .625rem .875rem;
+  border: 1px solid #2a2f3c; border-radius: .75rem; background: var(--ui-background); color: var(--ui-foreground);
+  font: inherit;
+}
+.auth-input::placeholder { color: #8a90a0; }
+.auth-input:focus { border-color: #8c90ff; outline: none; box-shadow: 0 0 0 3px #8c90ff44; }
+.auth-primary, .auth-secondary, .auth-danger {
+  display: inline-flex; min-height: 48px; min-width: 9rem; align-items: center; justify-content: center; gap: .5rem;
+  padding: .5rem 1.125rem; border-radius: .75rem; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+.auth-primary { background: var(--ui-primary); color: #fff; border: 0; }
+.auth-primary:hover { background: #4b4fd0; }
+.auth-secondary { border: 1px solid var(--ui-border); color: var(--ui-foreground); background: transparent; }
+.auth-secondary:hover { background: #1d212c; }
+.auth-danger { border: 1px solid #6b2e36; color: var(--ui-danger-text); background: transparent; }
+.auth-primary:disabled, .auth-secondary:disabled { opacity: .6; cursor: not-allowed; }
+
+.panel-card { background: var(--ui-background); border: 1px solid var(--ui-line); border-radius: 1rem; }
+.panel-chip { display: inline-flex; align-items: center; gap: .375rem; padding: .25rem .625rem; border-radius: 999px; font-size: .8125rem; font-weight: 600; }
+.panel-chip[data-tone='success'] { background: var(--ui-success-bg); color: var(--ui-success); }
+.panel-chip[data-tone='warning'] { background: var(--ui-warning-bg); color: var(--ui-warning); }
+.panel-chip[data-tone='neutral'] { background: #262a36; color: #c9cdd8; }
+.panel-chip[data-tone='danger'] { background: #3b1a20; color: var(--ui-danger-text); }
+.panel-muted { color: var(--ui-muted); }
+
+a { color: var(--ui-link); text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: #d4d7ff; }
+a.auth-primary, a.auth-secondary, a.auth-danger { text-decoration: none; }
+a.auth-primary { color: #fff; }
+a.auth-secondary { color: var(--ui-foreground); }
+:focus-visible { outline: 3px solid var(--ui-focus); outline-offset: 3px; }
+select.auth-input option { background: var(--ui-background); }

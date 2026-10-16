@@ -29,11 +29,11 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
         {t(`ordersPanel.status.${status}`)} ({totals.get(status) ?? 0})</a>)}
     </nav>
     {orders?.length ? <ul className="grid gap-3">{orders.map((order) => <li key={order.id}>
-      <a className="block min-h-16 rounded-xl border border-slate-300 p-4 hover:bg-slate-50"
+      <a className="block min-h-16 rounded-xl border border-[#2a2f3c] p-4 hover:bg-[#13161e]"
         href={`/orders/${order.id}?store=${context.selected.id}`}>
         <strong>#{order.number}</strong> · {t(`ordersPanel.status.${order.status}`)}
         <span className="block break-all">{order.email}</span>
         <span>{formatMoney({ amount: BigInt(order.total_amount), currency: order.currency as CurrencyCode }, 'es-AR')}</span>
-      </a></li>)}</ul> : <p className="rounded-xl border border-slate-300 p-6">{t('ordersPanel.empty')}</p>}
+      </a></li>)}</ul> : <p className="rounded-xl border border-[#2a2f3c] p-6">{t('ordersPanel.empty')}</p>}
   </main></PanelShell>;
 }

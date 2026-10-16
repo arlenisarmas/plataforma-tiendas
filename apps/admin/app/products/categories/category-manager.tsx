@@ -19,7 +19,7 @@ export function CategoryManager({ storeId, initial, labels }: { storeId: string;
     start(async () => { const result = await reorderCategories({ storeId, ids: next.map((row) => row.id) });
       if (result.error) { setError(labels.error); setCategories(categories); } });
   };
-  return <div className="space-y-5"><form className="space-y-3 rounded-xl border border-slate-300 p-4" onSubmit={(event) => {
+  return <div className="space-y-5"><form className="space-y-3 rounded-xl border border-[#2a2f3c] p-4" onSubmit={(event) => {
     event.preventDefault(); start(async () => { const result = await createCategory({ storeId, name, parentId: parentId || null,
       position: categories.length }); if (result.error) setError(labels.error); else window.location.reload(); });
   }}><label className="block font-semibold">{labels.name}<input className="auth-input" required maxLength={80} value={name}
@@ -28,12 +28,12 @@ export function CategoryManager({ storeId, initial, labels }: { storeId: string;
       <option value="">{labels.none}</option>{categories.filter((item) => !item.parent_id).map((item) =>
         <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
     <button className="auth-primary" type="submit" disabled={pending}>{labels.create}</button></form>
-    {error && <p role="alert" className="text-red-700">{error}</p>}
+    {error && <p role="alert" className="text-[#ff9aa5]">{error}</p>}
     <ul className="space-y-2">{categories.map((category, index) => <li key={category.id} draggable
       onDragStart={(event) => event.dataTransfer.setData('text/plain', String(index))}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => { event.preventDefault(); move(Number(event.dataTransfer.getData('text/plain')), index); }}
-      className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-300 p-3">
+      className="flex flex-wrap items-center gap-3 rounded-lg border border-[#2a2f3c] p-3">
       <span>{category.parent_id ? '↳ ' : ''}{category.name}</span>
       <button className="auth-secondary ml-auto" type="button" disabled={pending || index === 0} onClick={() => move(index, index - 1)}>{labels.up}</button>
       <button className="auth-secondary" type="button" disabled={pending || index === categories.length - 1} onClick={() => move(index, index + 1)}>{labels.down}</button>

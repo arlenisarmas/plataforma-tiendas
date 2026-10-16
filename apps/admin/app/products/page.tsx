@@ -37,16 +37,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     <h1 className="text-3xl font-bold">{t('products.title')}</h1>
     <div className="flex flex-wrap gap-3"><a className="auth-primary" href={`/products/new?store=${storeId}`}>{t('products.add')}</a>
       <a className="auth-secondary" href={`/products/categories?store=${storeId}`}>{t('products.categories')}</a></div>
-    {params.saved && <p role="status" className="text-green-800">{t('products.saved')}</p>}
+    {params.saved && <p role="status" className="text-[#7ee2b3]">{t('products.saved')}</p>}
     <form className="grid gap-3 sm:grid-cols-2" action="/products" method="get"><input type="hidden" name="store" value={storeId} />
       <label>{t('products.search')}<input className="auth-input" name="q" defaultValue={query} /></label>
       <label>{t('products.filter')}<select className="auth-input" name="category" defaultValue={category.success ? category.data : ''}>
         <option value="">{t('products.all')}</option>{(categories.data ?? []).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <button className="auth-secondary" type="submit">{t('products.search')}</button></form>
-    {data.length === 0 ? <p className="rounded-xl border border-slate-300 p-6">{t('products.empty')}</p> :
+    {data.length === 0 ? <p className="rounded-xl border border-[#2a2f3c] p-6">{t('products.empty')}</p> :
       <ul className="grid gap-3">{data.map((product) => { const asset = assetMap.get(photos.get(product.id) ?? '');
         const price = prices.get(product.id);
-        return <li key={product.id} className="flex min-h-24 items-center gap-4 rounded-xl border border-slate-300 p-3">
+        return <li key={product.id} className="flex min-h-24 items-center gap-4 rounded-xl border border-[#2a2f3c] p-3">
           {asset && <img className="h-20 w-20 rounded-lg object-cover" alt={asset.alt_text ?? ''}
             src={`${base}/storage/v1/object/public/store-media/${asset.path.split('/').map(encodeURIComponent).join('/')}`} />}
           <div className="min-w-0"><strong>{product.name}</strong><p>{product.status === 'active' ? t('products.active') : t('products.draft')}</p>
