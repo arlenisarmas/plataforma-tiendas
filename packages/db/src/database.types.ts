@@ -683,6 +683,9 @@ isOneToOne: false
 "assert_store_member":
 { Args: { "p_store_id": string }; Returns: undefined
                            },
+"check_store_slug":
+{ Args: { "p_slug": string }; Returns: string
+                           },
 "commit_reservation":
 { Args: { "p_order_id": string }; Returns: undefined
                            },
@@ -700,6 +703,9 @@ isOneToOne: false
                            },
 "is_platform_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
+                           },
+"is_reserved_store_slug":
+{ Args: { "p_slug": string }; Returns: boolean
                            },
 "is_store_member":
 { Args: { "p_store_id": string }; Returns: boolean

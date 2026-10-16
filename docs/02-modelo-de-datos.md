@@ -1,7 +1,7 @@
 # 02 · Modelo de datos y seguridad
 
 > La fuente de verdad es `supabase/migrations/`. Este documento la explica.
-> Validado con 53 escenarios automáticos en `supabase/tests/escenarios/` (todos en verde).
+> Validado con 58 escenarios automáticos en `supabase/tests/escenarios/` (todos en verde).
 
 ## 1. Diagrama de entidades
 
@@ -92,6 +92,7 @@ Errores de negocio con códigos estables (la app los traduce a mensajes amables,
 | Función | Quién | Qué hace |
 |---|---|---|
 | `create_store(name, slug, country, currency, locale?, tz?)` | authenticated | Crea tienda + dueño + contador + página de inicio. Máx. 5 por persona |
+| `check_store_slug(slug)` | authenticated | `disponible` / `en_uso` / `invalida`. No revela datos de otras tiendas. Incluye direcciones reservadas (admin, api, www…) |
 | `publish_store(store_id)` | dueño | Publica tema y tienda. Requiere inicio publicado |
 | `accept_store_invitation(token)` | authenticated | Suma al usuario si el email coincide y no venció |
 | `publish_page(page_id, note?)` | miembro | Congela el borrador como nueva versión y la publica |

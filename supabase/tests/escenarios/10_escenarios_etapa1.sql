@@ -49,6 +49,14 @@ insert into t.ctx values ('SB', public.create_store('Carpintería', 'carpinteria
 select t.eq('B ve solo su tienda', (select count(*) from public.stores), 1::bigint);
 select t.eq('moneda normalizada', (select currency::text from public.stores), 'CLP');
 
+-- 1b. Disponibilidad de dirección (sin revelar tiendas ajenas)
+select t.eq('dirección libre', public.check_store_slug('mi-tienda-nueva'), 'disponible');
+select t.eq('dirección usada por otra tienda', public.check_store_slug('chepeludos'), 'en_uso');
+select t.eq('dirección reservada', public.check_store_slug('admin'), 'en_uso');
+select t.eq('dirección inválida', public.check_store_slug('Con Espacios'), 'invalida');
+select t.expect_error('no se crea tienda con dirección reservada',
+  $$select public.create_store('Panel', 'panel', 'AR', 'ARS')$$, 'DIRECCION_EN_USO');
+
 -- 2. Aislamiento entre tiendas -------------------------------------------------
 select t.as_user('aaaaaaaa-0000-0000-0000-000000000001');
 insert into public.categories (store_id, name, slug) values (t.v('SA'), 'Perros', 'perros');
