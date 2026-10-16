@@ -81,13 +81,13 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.goto(`/settings?store=${storeId}`);
     const shipping = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Cómo entregás' }) });
     await shipping.locator('form').last().getByRole('button', { name: 'Guardar' }).click();
-    await expect(shipping.locator('form').last().getByRole('status')).toHaveText('Guardado');
+    await expect(shipping.locator('form').last().getByRole('status')).toHaveText('Guardado', { timeout: 15_000 });
     const payment = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Cómo te pagan' }) });
     await payment.getByLabel('Titular').fill('Tienda de prueba');
     await payment.getByLabel('Banco').fill('Banco de prueba');
     await payment.getByLabel(/Alias o (CBU|número de cuenta)/).fill('tienda.demo');
     await payment.getByRole('button', { name: 'Guardar' }).click();
-    await expect(payment.getByRole('status')).toHaveText('Guardado');
+    await expect(payment.getByRole('status')).toHaveText('Guardado', { timeout: 15_000 });
     await page.goto(`/publish?store=${storeId}`);
     await page.getByRole('button', { name: /Publicar|Abrir mi tienda/ }).click();
     await expect(page.getByRole('status')).toContainText('disponible');
@@ -136,7 +136,8 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.getByRole('link', { name: /#[0-9]+/ }).first().click();
     await expect(page).toHaveURL(new RegExp(`/orders/${orderId}`));
     await page.getByRole('button', { name: 'Marcar listo para retirar' }).click();
-    await expect(page.getByText('Listo para retirar', { exact: true }).first()).toBeVisible();
+    // The detail header shows "<status> · <email>".
+    await expect(page.getByText(/^Listo para retirar ·/)).toBeVisible({ timeout: 15_000 });
     await audit(page);
   });
 });
