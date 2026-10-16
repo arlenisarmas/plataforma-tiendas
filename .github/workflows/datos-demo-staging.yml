@@ -1,0 +1,63 @@
+name: Datos de ejemplo en staging
+
+# Carga las tiendas de ejemplo (supabase/seed.sql) en la base de staging, una sola vez,
+# y asocia la dirección de Vercel de la tienda a "Che Peludos".
+# Se corre a mano: Actions → Datos de ejemplo en staging → Run workflow.
+# Solo para staging: nunca contra producción.
+
+on:
+  workflow_dispatch:
+    inputs:
+      hostname:
+        description: 'Dirección de la tienda en Vercel (ej. plataforma-tiendas-storefront.vercel.app)'
+        required: false
+        default: ''
+
+concurrency:
+  group: db-staging
+  cancel-in-progress: false
+
+jobs:
+  demo:
+    name: Cargar datos de ejemplo
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_REGION: ${{ vars.SUPABASE_REGION || 'ca-central-1' }}
+      HOSTNAME_TIENDA: ${{ inputs.hostname }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cargar datos
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq postgresql-client > /dev/null
+          PASS=$(python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"],safe=""))')
+          echo "::add-mask::$PASS"
+          URL=""
+          for HOST in aws-1-${SUPABASE_REGION}.pooler.supabase.com aws-0-${SUPABASE_REGION}.pooler.supabase.com; do
+            CAND="postgresql://postgres.${SUPABASE_PROJECT_REF}:${PASS}@${HOST}:5432/postgres?sslmode=require"
+            echo "::add-mask::$CAND"
+            if psql "$CAND" -Atqc 'select 1' > /dev/null 2>&1; then URL="$CAND"; break; fi
+          done
+          [ -n "$URL" ] || { echo "::error::No se pudo conectar a staging"; exit 1; }
+
+          EXISTE=$(psql "$URL" -Atqc "select count(*) from public.stores where slug = 'chepeludos'")
+          if [ "$EXISTE" = "0" ]; then
+            psql "$URL" -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
+            echo "::notice title=Staging::Datos de ejemplo cargados"
+          else
+            echo "::notice title=Staging::Los datos de ejemplo ya estaban cargados"
+          fi
+
+          if [ -n "$HOSTNAME_TIENDA" ]; then
+            H=$(echo "$HOSTNAME_TIENDA" | tr 'A-Z' 'a-z' | sed -E 's#^https?://##; s#/.*$##')
+            echo "$H" | grep -Eq '^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$' || { echo "::error::Dirección inválida"; exit 1; }
+            psql "$URL" -v ON_ERROR_STOP=1 -q -v h="$H" <<'SQL'
+          insert into public.store_domains (store_id, hostname, kind, is_primary, verified_at)
+          select id, :'h', 'custom', false, now() from public.stores where slug = 'chepeludos'
+          on conflict (hostname) do nothing;
+          SQL
+            echo "::notice title=Staging::Dirección $H asociada a Che Peludos"
+          fi
+          psql "$URL" -Atqc "select slug || ' ' || status from public.stores order by slug"
