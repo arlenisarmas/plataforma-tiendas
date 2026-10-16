@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { slugify } from '@plataforma/core';
 import { StepWizard } from '@plataforma/ui';
+import { templateKinds, templatePalettes, type TemplateKind } from '@plataforma/blocks';
 import { compressImage } from '../../../lib/compress-image';
 import { countryDefaults } from '../../../lib/store-setup';
 import { checkStoreSlug, createStoreAction } from './actions';
@@ -13,7 +14,7 @@ type Labels = Record<'title' | 'nameStep' | 'name' | 'address' | 'addressAvailab
   'country' | 'advanced' | 'locale' | 'timezone' | 'finishStep' | 'logo' | 'skipLogo' |
   'palette' | 'preview' | 'back' | 'next' | 'finish' | 'progress' | 'creating' | 'invalid' | 'limit' | 'failed', string>;
 
-export function StoreWizard({ labels }: { labels: Labels }) {
+export function StoreWizard({ labels, industries }: { labels: Labels; industries: Record<TemplateKind, string> }) {
   const router = useRouter();
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -24,6 +25,7 @@ export function StoreWizard({ labels }: { labels: Labels }) {
   const [timezone, setTimezone] = useState<string>(countryDefaults.AR.timezone);
   const [advanced, setAdvanced] = useState(false);
   const [palette, setPalette] = useState('fresco');
+  const [industry, setIndustry] = useState<TemplateKind>('general');
   const [logo, setLogo] = useState<File>();
   const [error, setError] = useState('');
   const [pending, start] = useTransition();
@@ -46,7 +48,7 @@ export function StoreWizard({ labels }: { labels: Labels }) {
   const complete = () => start(async () => {
     setError('');
     const form = new FormData();
-    for (const [key, value] of Object.entries({ name, slug, industry: 'general', country, locale, timezone, palette })) form.set(key, value);
+    for (const [key, value] of Object.entries({ name, slug, industry, country, locale, timezone, palette })) form.set(key, value);
     if (logo) {
       try { form.set('logo', await compressImage(logo)); }
       catch { setError(labels.invalid); return; }
@@ -70,7 +72,11 @@ export function StoreWizard({ labels }: { labels: Labels }) {
           availability === 'en_uso' ? labels.addressUsed : availability === 'disponible' ? labels.addressAvailable : labels.checking}</p></div>,
     ] },
     { title: labels.industryStep, fields: [<label key="industry" className="block font-semibold">{labels.industry}
-      <select className={fieldClass} defaultValue="general"><option value="general">{labels.general}</option></select></label>] },
+      <select className={fieldClass} value={industry} onChange={(event) => {
+        const next = event.target.value as TemplateKind; setIndustry(next); setPalette(templatePalettes[next]);
+      }}>
+        {templateKinds.map((kind) => <option key={kind} value={kind}>{industries[kind]}</option>)}
+      </select></label>] },
     { title: labels.countryStep, fields: [
       <label key="country" className="block font-semibold">{labels.country}<select className={fieldClass} value={country}
         onChange={(event) => changeCountry(event.target.value as keyof typeof countryDefaults)}>

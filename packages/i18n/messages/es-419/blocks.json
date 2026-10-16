@@ -87,5 +87,12 @@
   "contactPhone": "Teléfono",
   "contactEmail": "Email",
   "contactAddress": "Dirección",
-  "contactHours": "Horarios"
+  "contactHours": "Horarios",
+  "templates": {
+    "mascotas": { "intro": "Todo para acompañar a tus compañeros de cuatro patas.", "about": "Nos encanta cuidar a quienes llenan tu casa de alegría. Contá aquí cómo empezó tu proyecto.", "contact": "Hola, quiero saber más sobre tus productos para mascotas.", "faqQuestion": "¿Cómo elijo el producto indicado?", "faqAnswer": "Escribinos y te ayudamos a encontrar lo mejor para tu mascota." },
+    "carpinteria-muebles": { "intro": "Piezas hechas con dedicación para disfrutar cada espacio.", "about": "Cada pieza tiene una historia. Contá aquí qué materiales hacen único tu trabajo.", "contact": "Hola, quiero consultar por un mueble.", "faqQuestion": "¿Puedo pedir un trabajo a medida?", "faqAnswer": "Escribinos con tu idea y te contamos las opciones." },
+    "ropa-accesorios": { "intro": "Encontrá piezas que van con tu estilo.", "about": "Nos gusta que cada persona se exprese a su manera. Contá aquí la historia de tu marca.", "contact": "Hola, quiero consultar por una prenda.", "faqQuestion": "¿Cómo elijo mi talla?", "faqAnswer": "Escribinos y te ayudamos con las medidas." },
+    "comida-casera": { "intro": "Sabores hechos en casa para compartir.", "about": "Cocinamos con cariño y buenos ingredientes. Contá aquí la historia de tus recetas.", "contact": "Hola, quiero consultar por tus comidas.", "faqQuestion": "¿Con cuánta anticipación hago mi pedido?", "faqAnswer": "Escribinos y coordinamos la fecha que necesitás." },
+    "general": { "intro": "Bienvenido a nuestra tienda. Mirá lo que preparamos para vos.", "about": "Hay una historia detrás de cada negocio. Contá aquí la tuya.", "contact": "Hola, quiero hacer una consulta.", "faqQuestion": "¿Cómo puedo hacer una consulta?", "faqAnswer": "Escribinos y te respondemos lo antes posible." }
+  }
 }
