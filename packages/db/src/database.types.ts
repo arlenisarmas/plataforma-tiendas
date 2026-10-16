@@ -395,6 +395,26 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"platform_invitations": {
+                  Row: {
+                    "accepted_at": string | null,"accepted_by": string | null,"can_create_stores": boolean,"created_at": string,"email": string,"expires_at": string,"full_name": string | null,"id": string,"invited_by": string | null,"max_stores": number,"revoked_at": string | null,"store_id": string | null,"store_role": Database["public"]['Enums']["member_role"] | null,"token_hash": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "accepted_at"?: string | null,"accepted_by"?: string | null,"can_create_stores"?: boolean,"created_at"?: string,"email": string,"expires_at"?: string,"full_name"?: string | null,"id"?: string,"invited_by"?: string | null,"max_stores"?: number,"revoked_at"?: string | null,"store_id"?: string | null,"store_role"?: Database["public"]['Enums']["member_role"] | null,"token_hash": string
+                  }
+                  Update: {
+                    "accepted_at"?: string | null,"accepted_by"?: string | null,"can_create_stores"?: boolean,"created_at"?: string,"email"?: string,"expires_at"?: string,"full_name"?: string | null,"id"?: string,"invited_by"?: string | null,"max_stores"?: number,"revoked_at"?: string | null,"store_id"?: string | null,"store_role"?: Database["public"]['Enums']["member_role"] | null,"token_hash"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "platform_invitations_store_id_fkey"
+      columns: ["store_id"]
+isOneToOne: false
+      referencedRelation: "stores"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"product_images": {
                   Row: {
                     "asset_id": string,"position": number,"product_id": string,"store_id": string
@@ -481,14 +501,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"full_name": string | null,"guided": boolean,"id": string,"locale": string,"text_scale": number,"ui_mode": string,"updated_at": string
+                    "can_create_stores": boolean,"created_at": string,"full_name": string | null,"guided": boolean,"id": string,"last_seen_at": string | null,"locale": string,"max_stores": number,"status": string,"text_scale": number,"ui_mode": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"full_name"?: string | null,"guided"?: boolean,"id": string,"locale"?: string,"text_scale"?: number,"ui_mode"?: string,"updated_at"?: string
+                    "can_create_stores"?: boolean,"created_at"?: string,"full_name"?: string | null,"guided"?: boolean,"id": string,"last_seen_at"?: string | null,"locale"?: string,"max_stores"?: number,"status"?: string,"text_scale"?: number,"ui_mode"?: string,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"full_name"?: string | null,"guided"?: boolean,"id"?: string,"locale"?: string,"text_scale"?: number,"ui_mode"?: string,"updated_at"?: string
+                    "can_create_stores"?: boolean,"created_at"?: string,"full_name"?: string | null,"guided"?: boolean,"id"?: string,"last_seen_at"?: string | null,"locale"?: string,"max_stores"?: number,"status"?: string,"text_scale"?: number,"ui_mode"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -665,13 +685,36 @@ isOneToOne: false
       referencedColumns: ["store_id","id"]
     }
                   ]
+                },"work_sessions": {
+                  Row: {
+                    "id": number,"last_seen_at": string,"started_at": string,"store_id": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: never,"last_seen_at"?: string,"started_at"?: string,"store_id"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "id"?: never,"last_seen_at"?: string,"started_at"?: string,"store_id"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "work_sessions_store_id_fkey"
+      columns: ["store_id"]
+isOneToOne: false
+      referencedRelation: "stores"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
             [_ in never]: never
           }
           Functions: {
-            "accept_store_invitation":
+            "accept_platform_invitation":
+{ Args: { "p_token": string }; Returns: string
+                           },
+"accept_store_invitation":
 { Args: { "p_token": string }; Returns: string
                            },
 "adjust_stock":
@@ -680,8 +723,16 @@ isOneToOne: false
 "apply_payment_status":
 { Args: { "p_payment_id": string,"p_provider_payment_id"?: string,"p_raw"?: Json,"p_status": Database["public"]['Enums']["payment_status"] }; Returns: undefined
                            },
+"assert_platform_admin":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "assert_store_member":
 { Args: { "p_store_id": string }; Returns: undefined
+                           },
+"check_platform_invitation":
+{ Args: { "p_token": string }; Returns: {
+              "email": string,"full_name": string
+            }[]
                            },
 "check_store_slug":
 { Args: { "p_slug": string }; Returns: string
@@ -695,8 +746,14 @@ isOneToOne: false
 "confirm_manual_payment":
 { Args: { "p_approve": boolean,"p_payment_id": string }; Returns: undefined
                            },
+"create_platform_invitation":
+{ Args: { "p_can_create": boolean,"p_email": string,"p_full_name": string,"p_max_stores": number,"p_store_id": string,"p_store_role": Database["public"]['Enums']["member_role"],"p_token_hash": string }; Returns: string
+                           },
 "create_store":
 { Args: { "p_country_code": string,"p_currency": string,"p_locale"?: string,"p_name": string,"p_slug": string,"p_timezone"?: string }; Returns: string
+                           },
+"current_user_active":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "extensions_digest":
 { Args: { "p_value": string }; Returns: string
@@ -725,6 +782,34 @@ isOneToOne: false
 "notify_store_owners":
 { Args: { "p_body"?: string,"p_kind": string,"p_link"?: string,"p_store_id": string,"p_title": string }; Returns: undefined
                            },
+"platform_activity":
+{ Args: { "p_limit"?: number,"p_offset"?: number,"p_store"?: string,"p_user"?: string }; Returns: {
+              "action": string,"actor_id": string,"actor_name": string,"changes": Json,"created_at": string,"entity": string,"id": number,"store_id": string,"store_name": string
+            }[]
+                           },
+"platform_overview":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"platform_people":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "can_create_stores": boolean,"created_at": string,"email": string,"full_name": string,"id": string,"is_admin": boolean,"last_seen_at": string,"max_stores": number,"owned_stores": number,"status": string,"stores": Json
+            }[]
+                           },
+"platform_presence":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "email": string,"full_name": string,"last_seen_at": string,"started_at": string,"store_id": string,"store_name": string,"user_id": string
+            }[]
+                           },
+"platform_stores":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "country_code": string,"created_at": string,"currency": string,"id": string,"last_activity": string,"name": string,"orders": number,"owners": string,"products": number,"slug": string,"status": string
+            }[]
+                           },
+"platform_work_hours":
+{ Args: { "p_from": string,"p_to": string }; Returns: {
+              "email": string,"full_name": string,"minutes": number,"sessions": number,"store_id": string,"store_name": string,"user_id": string
+            }[]
+                           },
 "publish_page":
 { Args: { "p_note"?: string,"p_page_id": string }; Returns: string
                            },
@@ -737,14 +822,29 @@ isOneToOne: false
 "release_reservation":
 { Args: { "p_order_id": string }; Returns: undefined
                            },
+"renew_platform_invitation":
+{ Args: { "p_id": string,"p_token_hash": string }; Returns: undefined
+                           },
 "reserve_stock":
 { Args: { "p_order_id": string,"p_ttl"?: string }; Returns: undefined
                            },
 "restore_page_version":
 { Args: { "p_page_id": string,"p_version_id": string }; Returns: undefined
                            },
+"revoke_platform_invitation":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
 "set_payment_secret":
 { Args: { "p_method_id": string,"p_secret": string }; Returns: undefined
+                           },
+"set_person_permissions":
+{ Args: { "p_can_create": boolean,"p_max_stores": number,"p_status": string,"p_user": string }; Returns: undefined
+                           },
+"set_store_suspended":
+{ Args: { "p_store": string,"p_suspended": boolean }; Returns: undefined
+                           },
+"touch_work_session":
+{ Args: { "p_store"?: string }; Returns: undefined
                            },
 "try_uuid":
 { Args: { "p_value": string }; Returns: string
