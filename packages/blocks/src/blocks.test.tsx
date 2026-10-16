@@ -98,12 +98,13 @@ describe('block rendering', () => {
             ? { title: '<script>alert(1)</script>' }
             : definition.type === 'rich-text'
               ? { body: '<img src=x onerror=alert(1)>' }
-              : {};
+              : definition.defaults;
         const html = renderToStaticMarkup(
           await renderPage([{ id: 'a', type: definition.type, version: 1, variant: variant.id, props }], ctx, theme, {
             resolveDefinition: (type) => type === definition.type ? { ...definition,
               loader: async () => type === 'featured-products' || type === 'product-grid'
-                ? { items: [], outOfStockLabel: 'Sin stock' } : [],
+                ? { items: [], outOfStockLabel: 'Sin stock' }
+                : type === 'contact' ? { labels: { whatsapp: 'WhatsApp', phone: 'Teléfono', email: 'Email', address: 'Dirección', hours: 'Horarios' }, email: 'hola@ejemplo.com' } : [],
             } as unknown as BlockDefinition : undefined,
           }),
         );

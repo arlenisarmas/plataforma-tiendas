@@ -14,7 +14,7 @@ type Image = z.infer<typeof image>;
 export type ProductCardData = Product & { variant: Variant | undefined; image: Image | undefined; currency: z.infer<typeof store>['currency'] };
 export type CategoryData = z.infer<typeof category>;
 
-async function readView<T extends z.ZodType>(view: string, schema: T, ctx: StoreContext, filters: Record<string, string> = {}): Promise<z.infer<T>[]> {
+export async function readView<T extends z.ZodType>(view: string, schema: T, ctx: StoreContext, filters: Record<string, string> = {}): Promise<z.infer<T>[]> {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!base || !key) throw new Error('Missing public Supabase settings');

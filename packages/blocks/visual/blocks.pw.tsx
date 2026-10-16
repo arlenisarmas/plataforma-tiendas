@@ -22,7 +22,18 @@ function previewData(type: string) {
     return { items: Array.from({ length: 4 }, (_, index) => ({ ...product, id: `${assetId}-${index}` })), outOfStockLabel: 'Sin stock' };
   if (type === 'category-grid') return Array.from({ length: 4 }, (_, index) =>
     ({ id: `${assetId}-${index}`, store_id: assetId, name: 'Muebles del hogar', slug: 'muebles', image_asset_id: assetId }));
+  if (type === 'contact') return { email: 'hola@ejemplo.com', phone: '+5491100000000', address: 'Calle 1, Buenos Aires', hours: 'Lunes a viernes', whatsapp: '+5491100000000',
+    labels: { whatsapp: 'WhatsApp', phone: 'Teléfono', email: 'Email', address: 'Dirección', hours: 'Horarios' } };
   return [];
+}
+function previewProps(type: string, defaults: unknown) {
+  if (type === 'announcement-bar') return { text: 'Envío gratis desde $50.000', button: { label: 'Ver productos', href: 'https://example.com' } };
+  if (type === 'image-with-text') return { title: 'Nuestra historia', body: 'Creamos muebles para tu casa.', image: { assetId, alt: 'Mesa artesanal' } };
+  if (type === 'gallery') return { title: 'Fotos', images: Array.from({ length: 5 }, () => ({ assetId, alt: 'Mueble artesanal' })) };
+  if (type === 'testimonials') return { title: 'Opiniones', items: Array.from({ length: 3 }, () => ({ quote: 'Me gustó mucho la mesa.', author: 'Ana' })) };
+  if (type === 'faq') return { title: 'Preguntas frecuentes', items: Array.from({ length: 3 }, (_, index) => ({ question: `Pregunta ${index + 1}`, answer: 'Sí, hacemos envíos.' })) };
+  if (type === 'contact') return { title: 'Contacto', whatsappMessage: 'Hola, quiero consultar.' };
+  return defaults;
 }
 
 for (const definition of registry) {
@@ -34,7 +45,7 @@ for (const definition of registry) {
               cta: { label: 'Ver productos', link: { kind: 'collection', categoryId: null } } }
           : definition.type === 'rich-text'
             ? { title: 'Nuestra historia', body: 'Hecho con cuidado para tu familia.' }
-            : {};
+            : previewProps(definition.type, definition.defaults);
       const blocks = await renderPage(
         [{ id: 'one', type: definition.type, version: 1, variant: variant.id, props }],
         { storeId: 'store', locale: 'es-419', assetUrl: () => image },
@@ -47,6 +58,11 @@ for (const definition of registry) {
         `<html><style>${css}</style><body style="margin:0"><main class="store-layout" style="${style}">${renderToStaticMarkup(blocks)}</main></body></html>`,
       );
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+      if (definition.type === 'faq' && variant.id === 'accordion') {
+        await page.getByText('Pregunta 1').focus();
+        await page.keyboard.press('Enter');
+        await expect(page.locator('details').first()).toHaveAttribute('open', '');
+      }
       if (process.env.CAPTURE_BLOCKS === '1' && definition.type === 'hero' && variant.id === 'split') {
         await mkdir(new URL('./screenshots', import.meta.url), { recursive: true });
         await page.screenshot({ path: 'visual/screenshots/hero-mobile.png', fullPage: true });
@@ -58,6 +74,12 @@ for (const definition of registry) {
         await page.screenshot({ path: 'visual/screenshots/products-mobile.png', fullPage: true });
         await page.setViewportSize({ width: 1280, height: 800 });
         await page.screenshot({ path: 'visual/screenshots/products-desktop.png', fullPage: true });
+      }
+      if (process.env.CAPTURE_BLOCKS === '1' && definition.type === 'gallery' && variant.id === 'mosaic') {
+        await mkdir(new URL('./screenshots', import.meta.url), { recursive: true });
+        await page.screenshot({ path: 'visual/screenshots/gallery-mobile.png', fullPage: true });
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.screenshot({ path: 'visual/screenshots/gallery-desktop.png', fullPage: true });
       }
     });
   }
