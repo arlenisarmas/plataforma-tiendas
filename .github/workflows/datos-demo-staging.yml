@@ -1,7 +1,7 @@
 name: Datos de ejemplo en staging
 
 # Carga las tiendas de ejemplo (supabase/seed.sql) en la base de staging, una sola vez,
-# y asocia la dirección de Vercel de la tienda a "Che Peludos".
+# asocia la dirección de Vercel de la tienda a "Che Peludos" y hace a arle@ejemplo.com administradora.
 # Se corre a mano: Actions → Datos de ejemplo en staging → Run workflow.
 # Solo para staging: nunca contra producción.
 
@@ -60,4 +60,11 @@ jobs:
           SQL
             echo "::notice title=Staging::Dirección $H asociada a Che Peludos"
           fi
+          # La cuenta de ejemplo de Arle administra la plataforma (consola). Idempotente.
+          psql "$URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+          insert into public.platform_admins (user_id)
+          select id from auth.users where email = 'arle@ejemplo.com'
+          on conflict do nothing;
+          SQL
+          psql "$URL" -Atqc "select 'admins: ' || count(*) from public.platform_admins"
           psql "$URL" -Atqc "select slug || ' ' || status from public.stores order by slug"
