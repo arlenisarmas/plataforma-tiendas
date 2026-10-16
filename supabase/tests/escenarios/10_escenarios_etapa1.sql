@@ -39,6 +39,20 @@ insert into auth.users (id, email, raw_user_meta_data) values
   ('cccccccc-0000-0000-0000-000000000003', 'compradora@ejemplo.com', '{}');
 select t.eq('perfil creado automáticamente', (select full_name from public.profiles where id = 'aaaaaaaa-0000-0000-0000-000000000001'), 'Arle');
 
+-- 0. Permisos para crear tiendas (T-033) -------------------------------------------
+set role authenticated;
+select t.as_user('aaaaaaaa-0000-0000-0000-000000000001');
+select t.expect_error('sin permiso no se crea tienda', $$select public.create_store('Nada', 'nada', 'AR', 'ARS')$$, 'SIN_PERMISO_PARA_CREAR');
+select t.expect_error('nadie se otorga permisos a sí mismo',
+  $$update public.profiles set can_create_stores = true, max_stores = 9 where id = 'aaaaaaaa-0000-0000-0000-000000000001'$$, 'permission denied');
+select t.expect_error('no-admin no lee la consola', $$select public.platform_overview()$$, 'SIN_PERMISO');
+select t.expect_error('no-admin no ve personas', $$select * from public.platform_people()$$, 'SIN_PERMISO');
+select t.expect_error('no-admin no cambia permisos',
+  $$select public.set_person_permissions('aaaaaaaa-0000-0000-0000-000000000001', true, 5::smallint, 'active')$$, 'SIN_PERMISO');
+reset role;
+update public.profiles set can_create_stores = true, max_stores = 5
+ where id in ('aaaaaaaa-0000-0000-0000-000000000001', 'bbbbbbbb-0000-0000-0000-000000000002');
+
 -- 1. Crear tiendas --------------------------------------------------------------
 set role authenticated;
 select t.as_user('aaaaaaaa-0000-0000-0000-000000000001');
@@ -197,8 +211,8 @@ select t.eq('B ahora ve productos de A como empleado', (select count(*) from pub
 select t.expect_error('empleado no edita la configuración de la tienda',
   format($q$do $x$ begin update public.stores set name = 'X' where id = %L; if not found then raise exception 'sin filas'; end if; end $x$$q$, t.v('SA')),
   'sin filas');
-select t.expect_error('empleado no ve auditoría',
-  format($q$do $x$ begin if (select count(*) from public.audit_log where store_id = %L) > 0 then raise exception 've auditoria'; end if; raise exception 'sin filas'; end $x$$q$, t.v('SA')), 'sin filas');
+select t.expect_error('empleado no ve auditoría de otros (solo sus propias acciones)',
+  format($q$do $x$ begin if (select count(*) from public.audit_log where store_id = %L and actor_id is distinct from 'bbbbbbbb-0000-0000-0000-000000000002') > 0 then raise exception 've auditoria'; end if; raise exception 'sin filas'; end $x$$q$, t.v('SA')), 'sin filas');
 select t.expect_error('no se suman miembros sin invitación',
   format($$insert into public.store_members (store_id, user_id) values (%L, 'cccccccc-0000-0000-0000-000000000003')$$, t.v('SA')), 'permission denied');
 select t.as_user('aaaaaaaa-0000-0000-0000-000000000001');
@@ -238,6 +252,58 @@ select t.expect_error('anon no lee Vault', format('select public.get_payment_sec
 set role authenticated;
 select t.expect_error('authenticated no escribe Vault',
   format('select public.set_payment_secret(%L, %L)', t.v('MP_A'), 'sample-value'), 'permission denied');
+
+-- 15. Consola de plataforma, invitaciones y presencia (T-033) --------------------
+reset role;
+insert into auth.users (id, email) values
+  ('dddddddd-0000-0000-0000-000000000004', 'admin@ejemplo.com'),
+  ('eeeeeeee-0000-0000-0000-000000000005', 'amigo@ejemplo.com');
+insert into public.platform_admins (user_id) values ('dddddddd-0000-0000-0000-000000000004');
+insert into t.ctx values ('PLAT_HASH', encode(public.extensions_digest('plat-123'), 'hex'));
+set role authenticated;
+select t.as_user('dddddddd-0000-0000-0000-000000000004');
+select t.eq('admin ve el resumen', (public.platform_overview() ->> 'people')::int >= 4, true);
+select t.eq('admin ve todas las tiendas', (select count(*) from public.platform_stores()) >= 1, true);
+insert into t.ctx values ('ST_AMIGO', public.create_store('Tienda Amigo', 'tienda-amigo', 'AR', 'ARS'));
+insert into t.ctx values ('INV_P', public.create_platform_invitation('Amigo@Ejemplo.com', 'Amigo', true, 2::smallint,
+  t.v('ST_AMIGO'), 'owner', (select v from t.ctx where k = 'PLAT_HASH')));
+select t.eq('invitación pendiente contada', (public.platform_overview() ->> 'invitationsPending')::int, 1);
+set role anon;
+select t.eq('el registro valida el token sin sesión', (select email from public.check_platform_invitation('plat-123')), 'amigo@ejemplo.com');
+select t.eq('token inválido no devuelve nada', (select count(*) from public.check_platform_invitation('otro')), 0::bigint);
+set role authenticated;
+select t.as_user('cccccccc-0000-0000-0000-000000000003');
+select t.expect_error('invitación de plataforma para otro email', $$select public.accept_platform_invitation('plat-123')$$, 'INVITACION_OTRO_EMAIL');
+select t.expect_error('no-admin no ve invitaciones',
+  $q$do $x$ begin if (select count(*) from public.platform_invitations) > 0 then raise exception 've invitaciones'; end if; raise exception 'sin filas'; end $x$$q$, 'sin filas');
+select t.as_user('eeeeeeee-0000-0000-0000-000000000005');
+select t.eq('aceptar devuelve la tienda', public.accept_platform_invitation('plat-123'), t.v('ST_AMIGO'));
+select t.eq('el amigo es dueño de su tienda', (select role::text from public.store_members where store_id = t.v('ST_AMIGO') and user_id = 'eeeeeeee-0000-0000-0000-000000000005'), 'owner');
+select t.eq('el admin deja de figurar como dueño', (select count(*) from public.store_members where store_id = t.v('ST_AMIGO')), 1::bigint);
+select t.eq('permiso y cupo aplicados', (select max_stores from public.profiles where id = 'eeeeeeee-0000-0000-0000-000000000005'), 2::smallint);
+select t.expect_error('invitación usada no sirve dos veces', $$select public.accept_platform_invitation('plat-123')$$, 'INVITACION_INVALIDA');
+insert into t.ctx values ('ST_AMIGO2', public.create_store('Segunda', 'segunda-amigo', 'AR', 'ARS'));
+select t.expect_error('respeta el cupo', $$select public.create_store('Tercera', 'tercera-amigo', 'AR', 'ARS')$$, 'LIMITE_DE_TIENDAS');
+select public.touch_work_session(t.v('ST_AMIGO'));
+select public.touch_work_session(t.v('ST_AMIGO'));
+select t.eq('la sesión de trabajo se extiende, no se duplica', (select count(*) from public.work_sessions), 1::bigint);
+select t.expect_error('no registra presencia en tiendas ajenas', format('select public.touch_work_session(%L)', t.v('SA')), 'SIN_PERMISO');
+select t.eq('ve sus propias acciones', (select count(*) from public.audit_log where actor_id = 'eeeeeeee-0000-0000-0000-000000000005') >= 1, true);
+select t.as_user('dddddddd-0000-0000-0000-000000000004');
+select t.eq('el admin ve quién trabaja ahora', (select count(*) from public.platform_presence()), 1::bigint);
+select t.eq('el admin ve horas trabajadas', (select count(*) from public.platform_work_hours(current_date - 1, current_date + 1)), 1::bigint);
+select t.eq('el admin ve la actividad', (select count(*) from public.platform_activity(10, 0, t.v('ST_AMIGO'), null)) >= 2, true);
+select t.expect_error('el admin no se pausa a sí mismo',
+  $$select public.set_person_permissions('dddddddd-0000-0000-0000-000000000004', true, 1::smallint, 'suspended')$$, 'NO_PODES_PAUSARTE');
+select public.set_person_permissions('eeeeeeee-0000-0000-0000-000000000005', true, 2::smallint, 'suspended');
+select t.as_user('eeeeeeee-0000-0000-0000-000000000005');
+select t.eq('persona pausada no ve su tienda', (select count(*) from public.stores where id = t.v('ST_AMIGO')), 0::bigint);
+select t.expect_error('persona pausada no crea tiendas', $$select public.create_store('X', 'x-pausada', 'AR', 'ARS')$$, 'SIN_PERMISO_PARA_CREAR');
+select t.as_user('dddddddd-0000-0000-0000-000000000004');
+select public.set_store_suspended(t.v('ST_AMIGO2'), true);
+select t.eq('tienda suspendida', (select status::text from public.stores where id = t.v('ST_AMIGO2')), 'suspended');
+select public.set_store_suspended(t.v('ST_AMIGO2'), false);
+select t.eq('tienda reactivada como borrador', (select status::text from public.stores where id = t.v('ST_AMIGO2')), 'draft');
 
 reset role;
 \echo '==== TODAS LAS PRUEBAS PASARON ===='
