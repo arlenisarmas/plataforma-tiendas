@@ -106,6 +106,13 @@ Errores de negocio con códigos estables (la app los traduce a mensajes amables,
 | `apply_payment_status(payment_id, status, provider_id?, raw?)` | servidor | Único punto que aplica efectos de un pago (stock + pedido + avisos) |
 | `confirm_manual_payment(payment_id, approve)` | miembro | Aprueba o rechaza un pago manual |
 | `get_order_for_buyer(order_id, token)` | anon | Estado del pedido para compradores sin cuenta |
+| `create_platform_invitation(...)` / `renew_` / `revoke_` | admin plataforma | Invita a una persona: permiso para crear tiendas (con cupo) y/o sumarla a una tienda con un rol |
+| `check_platform_invitation(token)` | anon | Para el registro: email de una invitación vigente |
+| `accept_platform_invitation(token)` | authenticated | Aplica permisos y membresía; si un admin creó la tienda para la persona, el admin deja de figurar como dueño |
+| `set_person_permissions(user, can_create, max, status)` | admin plataforma | Permisos, cupo y pausa de una persona (una persona pausada pierde acceso a las tiendas) |
+| `set_store_suspended(store, bool)` | admin plataforma | Suspende o reactiva una tienda |
+| `touch_work_session(store?)` | authenticated | Presencia: extiende la sesión de trabajo (15 min de inactividad abren una nueva) |
+| `platform_overview/stores/people/presence/activity/work_hours` | admin plataforma | Lecturas de la consola |
 
 Triggers: perfil automático al registrarse, inventario automático por variante,
 `updated_at`, protección del último dueño, validación de transiciones de pedido.
@@ -167,6 +174,8 @@ Vencimiento sugerido de reservas: 30 min para Mercado Pago, 48 h para pago manua
 | `PAGO_NO_EXISTE` / `PAGO_YA_RESUELTO` | Este pago ya fue revisado. |
 | `SOLO_PAGOS_MANUALES` | Este pago se confirma automáticamente. |
 | `PEDIDO_NO_ENCONTRADO` | No encontramos tu pedido. Revisá el link del mail. |
+| `SIN_PERMISO_PARA_CREAR` | Todavía no podés crear tiendas. Pedile a quien administra la plataforma que te habilite. |
+| `NO_PODES_PAUSARTE` | No podés pausar tu propio acceso. |
 
 ## 8. Pendientes de diseño (no bloquean Etapa 1)
 

@@ -35,6 +35,11 @@ select gen_random_uuid(), u.id, u.id::text,
 from auth.users u
 where u.id in ('a0000000-0000-4000-8000-000000000001', 'b0000000-0000-4000-8000-000000000002');
 
+-- Arle administra la plataforma; el hermano puede tener hasta 2 tiendas (T-033).
+insert into public.platform_admins (user_id) values ('a0000000-0000-4000-8000-000000000001');
+update public.profiles set can_create_stores = true, max_stores = 2
+ where id = 'b0000000-0000-4000-8000-000000000002';
+
 -- -----------------------------------------------------------------------------
 -- Tienda 1: Che Peludos (Arle) — publicada
 -- -----------------------------------------------------------------------------
