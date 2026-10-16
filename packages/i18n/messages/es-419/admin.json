@@ -42,5 +42,8 @@
   "checklist": { "logo": "Agregar logo", "product": "Agregar primer producto", "payment": "Elegir cómo te pagan", "shipping": "Configurar envíos", "page": "Preparar página de inicio", "publish": "Publicar tienda" },
   "today": "Hoy", "ordersToday": "{count} pedidos hoy", "notifications": "Notificaciones", "noNotifications": "No hay avisos nuevos.",
   "viewNotification": "Ver detalle", "markRead": "Marcar como leída", "sectionSoon": "Esta sección estará disponible pronto.",
-  "loading": "Preparando tu tienda...", "loadError": "No pudimos mostrar tu tienda. Intentá de nuevo.", "retry": "Intentar de nuevo"
+  "loading": "Preparando tu tienda...", "loadError": "No pudimos mostrar tu tienda. Intentá de nuevo.", "retry": "Intentar de nuevo",
+  "media": { "title": "Tus imágenes", "choose": "Elegir imagen", "upload": "Subir imagen", "camera": "Podés elegir una foto o tomarla con la cámara.",
+    "alt": "Descripción de la imagen (opcional)", "suggestion": "Por ejemplo: mesa de madera clara", "invalid": "Elegí una imagen de hasta 10 MB e intentá de nuevo.",
+    "failed": "No pudimos subir la imagen. Intentá de nuevo.", "selected": "Imagen elegida.", "empty": "Todavía no hay imágenes. Subí la primera." }
 }
