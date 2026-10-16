@@ -1,11 +1,20 @@
+import { redirect } from 'next/navigation';
 import { adminText } from '../lib/locale';
 import { dashboardData } from '../lib/panel-data';
+import { currentViewer } from '../lib/viewer';
+import { MySpace } from './my-space';
 import { readNotification } from './notification-actions';
 import { PanelShell } from './panel-shell';
 import { QuickSearch } from './quick-search';
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<{ store?: string }> }) {
   const [{ store }, t] = await Promise.all([searchParams, adminText()]);
+  if (!store) {
+    // Sin tienda elegida: la consola para admins de plataforma, «Mi espacio» para el resto (T-032).
+    const viewer = await currentViewer();
+    if (viewer.isAdmin) redirect('/platform');
+    return <MySpace viewer={viewer} />;
+  }
   const data = await dashboardData(store);
   const selected = data.selected.id;
   const items = [
@@ -14,7 +23,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     { key: 'page', href: `/page?store=${selected}` }, { key: 'publish', href: `/publish?store=${selected}` },
   ] as const;
   return <PanelShell context={data} active="home">
-    <main className="space-y-6 p-4 md:p-8">
+    <main className="space-y-6 px-4 py-7 md:px-8">
       <h1 className="text-3xl font-bold">{t('nav.home')}</h1>
       <QuickSearch label={t('quickSearch')} actions={[
         { label: t('quickAddProduct'), href: `/products?store=${selected}` },

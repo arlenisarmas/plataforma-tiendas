@@ -15,13 +15,13 @@ export async function panelContext(requested?: string) {
   const { data: memberships, error } = await client.from('store_members').select('store_id').eq('user_id', user.id);
   if (error) throw error;
   const ids = (memberships ?? []).map((item) => item.store_id);
-  if (ids.length === 0) redirect('/stores/new');
+  if (ids.length === 0) redirect('/');
   const { data, error: storesError } = await client.from('stores').select('id,name,slug,status,logo_asset_id,timezone').in('id', ids).order('name');
   if (storesError) throw storesError;
   const stores = z.array(storeSchema).parse(data);
-  if (stores.length === 0) redirect('/stores/new');
+  if (stores.length === 0) redirect('/');
   const selected = stores.find((item) => item.id === requested) ?? stores[0];
-  if (!selected) redirect('/stores/new');
+  if (!selected) redirect('/');
   return { client, userId: user.id, stores, selected };
 }
 

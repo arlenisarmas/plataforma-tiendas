@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { slugify } from '@plataforma/core';
 import { StepWizard } from '@plataforma/ui';
-import { templateKinds, templatePalettes, type TemplateKind } from '@plataforma/blocks';
+import { curatedPalettes, templateKinds, templatePalettes, type TemplateKind } from '@plataforma/blocks';
 import { compressImage } from '../../../lib/compress-image';
 import { countryCodes, countryDefaults } from '../../../lib/store-setup';
 
@@ -50,12 +50,47 @@ type Labels = Record<
   string
 >;
 
+type PreviewLabels = Record<'heading' | 'welcome' | 'slogan' | 'cta' | 'cart' | 'yourBusiness' | 'next'
+  | 'helpName' | 'helpIndustry' | 'helpCountry' | 'helpStyle', string>;
+type PaletteKey = keyof typeof curatedPalettes;
+const paletteKeys = Object.keys(curatedPalettes) as PaletteKey[];
+
+/** Vista previa en vivo: la tienda «se arma» mientras la persona responde. */
+function StorePreview({ name, palette, labels, intro }: { name: string; palette: PaletteKey; labels: PreviewLabels; intro: string }) {
+  const colors = curatedPalettes[palette];
+  const shown = name.trim() || labels.yourBusiness;
+  return <div className="flex flex-col gap-3">
+    <span className="text-sm font-semibold text-[#a3a9b8]">{labels.heading}</span>
+    <div aria-hidden="true" className="overflow-hidden rounded-2xl border border-[#232733]" style={{ background: colors.background, color: colors.text }}>
+      <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${colors.surface}` }}>
+        <strong className="text-lg" style={{ color: colors.primary }}>{shown}</strong>
+        <span className="text-sm">{labels.cart}</span>
+      </div>
+      <div className="flex flex-col gap-2 px-5 py-8" style={{ background: colors.surface }}>
+        <strong className="text-2xl leading-tight">{labels.welcome.replace('{name}', shown)}</strong>
+        <span className="text-[15px]">{intro || labels.slogan}</span>
+        <span className="mt-2 self-start rounded-full px-4 py-2 text-sm font-bold text-white" style={{ background: colors.primary }}>{labels.cta}</span>
+      </div>
+      <div className="grid grid-cols-3 gap-3 p-5">
+        {[0, 1, 2].map((item) => <div key={item} className="h-20 rounded-lg" style={{ background: colors.surface }} />)}
+      </div>
+    </div>
+    <span className="text-[13px] text-[#a3a9b8]">{labels.next}</span>
+  </div>;
+}
+
 export function StoreWizard({
   labels,
   industries,
+  preview,
+  paletteNames,
+  intros,
 }: {
   labels: Labels;
   industries: Record<TemplateKind, string>;
+  preview: PreviewLabels;
+  paletteNames: Record<PaletteKey, string>;
+  intros: Record<TemplateKind, string>;
 }) {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -68,7 +103,7 @@ export function StoreWizard({
   const [locale, setLocale] = useState<string>(countryDefaults.AR.locale);
   const [timezone, setTimezone] = useState<string>(countryDefaults.AR.timezone);
   const [advanced, setAdvanced] = useState(false);
-  const [palette, setPalette] = useState('fresco');
+  const [palette, setPalette] = useState<PaletteKey>('fresco');
   const [industry, setIndustry] = useState<TemplateKind>('general');
   const [logo, setLogo] = useState<File>();
   const [error, setError] = useState('');
@@ -138,6 +173,7 @@ export function StoreWizard({
   const steps = [
     {
       title: labels.nameStep,
+      help: preview.helpName,
       fields: [
         <label key="name" className="block font-semibold">
           {labels.name}
@@ -176,6 +212,7 @@ export function StoreWizard({
     },
     {
       title: labels.industryStep,
+      help: preview.helpIndustry,
       fields: [
         <label key="industry" className="block font-semibold">
           {labels.industry}
@@ -199,6 +236,7 @@ export function StoreWizard({
     },
     {
       title: labels.countryStep,
+      help: preview.helpCountry,
       fields: [
         <label key="country" className="block font-semibold">
           {labels.country}
@@ -252,6 +290,7 @@ export function StoreWizard({
     },
     {
       title: labels.finishStep,
+      help: preview.helpStyle,
       fields: [
         <div key="logo">
           <label className="block font-semibold">
@@ -265,27 +304,23 @@ export function StoreWizard({
           </label>
           <p className="mt-1 text-sm">{labels.skipLogo}</p>
         </div>,
-        <div key="palette">
-          <label className="block font-semibold">
-            {labels.palette}
-            <select
-              className={fieldClass}
-              value={palette}
-              onChange={(event) => setPalette(event.target.value)}
-            >
-              {['calido', 'fresco', 'natural', 'elegante', 'vibrante'].map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="mt-3 rounded-xl border border-[#2a2f3c] p-4" aria-label={labels.preview}>
-            <div
-              className={`h-12 rounded-lg ${palette === 'fresco' ? 'bg-[#5b5fe0]' : palette === 'natural' ? 'bg-[#2f7d5b]' : palette === 'calido' ? 'bg-[#9b2c3a]' : palette === 'elegante' ? 'bg-violet-950' : 'bg-pink-900'}`}
-            />
+        <fieldset key="palette" className="m-0 border-0 p-0">
+          <legend className="mb-3 font-semibold">{labels.palette}</legend>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(130px,1fr))] gap-3">
+            {paletteKeys.map((value) => {
+              const colors = curatedPalettes[value];
+              return <label key={value} className="flex min-h-11 cursor-pointer flex-col gap-2 rounded-xl border-2 border-[#2a2f3c] bg-[#0e1016] p-3 has-[:checked]:border-[#8c90ff] has-[:checked]:bg-[#232850]">
+                <input type="radio" name="palette" value={value} checked={palette === value}
+                  onChange={() => setPalette(value)} className="sr-only" />
+                <span aria-hidden="true" className="flex gap-1">
+                  {[colors.primary, colors.accent, colors.surface].map((color) =>
+                    <span key={color} className="h-6 flex-1 rounded" style={{ background: color }} />)}
+                </span>
+                <span className="text-[15px] font-semibold">{paletteNames[value]}</span>
+              </label>;
+            })}
           </div>
-        </div>,
+        </fieldset>,
       ],
     },
   ];
@@ -305,6 +340,7 @@ export function StoreWizard({
         }
         busy={pending}
         onComplete={complete}
+        aside={<StorePreview name={name} palette={palette} labels={preview} intro={intros[industry]} />}
       />
       {error && (
         <p role="alert" className="text-[#ff9aa5]">
