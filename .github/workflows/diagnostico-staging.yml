@@ -3,6 +3,11 @@ name: Diagnóstico de staging
 # Revisa que la tienda pública pueda leer los datos de staging (sin mostrar claves).
 on:
   workflow_dispatch:
+    inputs:
+      exponer_storefront:
+        description: 'Agregar el esquema storefront a la API de Supabase'
+        type: boolean
+        default: false
 
 jobs:
   diagnostico:
@@ -17,6 +22,14 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: 2.121.0
+      - name: Exponer esquema storefront en la API
+        if: inputs.exponer_storefront
+        run: |
+          OUT=$(curl -s -w ' HTTP=%{http_code}' -X PATCH "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/postgrest" \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H 'Content-Type: application/json' \
+            -d '{"db_schema":"public,graphql_public,storefront"}')
+          echo "::notice title=Exponer storefront::${OUT:0:400}"
+          sleep 20
       - name: Base de datos
         run: |
           sudo apt-get install -y -qq postgresql-client > /dev/null
