@@ -2,12 +2,14 @@
 
 import { createHash, randomBytes } from 'node:crypto';
 import { headers } from 'next/headers';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { calculateTotals, CURRENCY_EXPONENTS, MemoryRateLimiter, type CurrencyCode } from '@plataforma/core';
 // eslint-disable-next-line boundaries/dependencies -- guest checkout requires the server-only service role
 import { createServiceClient } from '@plataforma/db/server';
 import { ManualProvider, MercadoPagoProvider, type CheckoutResult } from '@plataforma/payments';
 import { currentCart } from './cart-server';
+import { instructionsText, sendNewOrderEmails } from './order-emails';
 
 const currencySchema = z.enum(Object.keys(CURRENCY_EXPONENTS) as [CurrencyCode, ...CurrencyCode[]]);
 const inputSchema = z.object({ storeId: z.uuid(), email: z.email(), fullName: z.string().trim().min(2).max(120),
@@ -113,8 +115,10 @@ export async function placeOrder(raw: unknown): Promise<CheckoutResponse> {
     if (payment.error || !payment.data) throw new Error('payment');
     const orderUrl = `${siteUrl.replace(/\/$/, '')}/pedido/${orderId}?token=${token}&tienda=${store.slug}`;
     let checkout: CheckoutResult;
+    let paymentInstructions: string | undefined;
     if (method.provider === 'manual') {
       const instructions = z.record(z.string(), z.string()).parse(method.instructions);
+      paymentInstructions = instructionsText(instructions);
       checkout = await new ManualProvider({ method: method.display_name, details: instructions,
         receiptRequired: true }).createCheckout({ paymentId: payment.data.id, orderId, currency: currency.data,
         total: totals.total.amount, description: `Pedido ${number.data}`, returnUrl: orderUrl, notificationUrl: '' });
@@ -127,6 +131,9 @@ export async function placeOrder(raw: unknown): Promise<CheckoutResponse> {
           notificationUrl: `${siteUrl.replace(/\/$/, '')}/api/payments/mercadopago` });
     } else throw new Error('unsupported payment provider');
     succeeded = true;
+    const emailOrder = { storeId, orderId, orderNumber: number.data, buyerEmail: input.data.email,
+      buyerName: input.data.fullName, orderUrl, ...(paymentInstructions ? { paymentInstructions } : {}) };
+    after(() => sendNewOrderEmails(client, emailOrder));
     return { ok: true, orderId, token, checkout };
   } catch { return { ok: false, error: 'payment' }; }
   finally {

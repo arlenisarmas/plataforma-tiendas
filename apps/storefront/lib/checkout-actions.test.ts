@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { service, cart } = vi.hoisted(() => ({ service: vi.fn(), cart: vi.fn() }));
+const { service, cart, emails } = vi.hoisted(() => ({ service: vi.fn(), cart: vi.fn(), emails: vi.fn() }));
 vi.mock('@plataforma/db/server', () => ({ createServiceClient: service }));
 vi.mock('./cart-server', () => ({ currentCart: cart }));
 vi.mock('next/headers', () => ({ headers: async () => ({ get: () => 'test-visitor' }) }));
+vi.mock('next/server', () => ({ after: (task: () => unknown) => { void task(); } }));
+vi.mock('./order-emails', async (original) => ({
+  ...await original<typeof import('./order-emails')>(), sendNewOrderEmails: emails }));
 
 import { placeOrder } from './checkout-actions';
 
@@ -58,6 +61,7 @@ describe('guest checkout', () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-only';
     process.env.NEXT_PUBLIC_STOREFRONT_URL = 'https://example.test';
+    emails.mockReset();
     cart.mockResolvedValue({ storeId, items: [{ productId, variantId, quantity: 2 }] });
   });
 
@@ -67,6 +71,15 @@ describe('guest checkout', () => {
     expect(result.ok).toBe(true);
     expect(fake.orderInsert).toHaveBeenCalledWith(expect.objectContaining({ total_amount: 2500 }));
     expect(fake.rpc).toHaveBeenCalledWith('reserve_stock', { p_order_id: orderId, p_ttl: '48 hours' });
+    expect(emails).toHaveBeenCalledWith(fake.client, expect.objectContaining({ orderId, orderNumber: 1001,
+      buyerEmail: 'buyer@example.test', paymentInstructions: 'alias: example' }));
+  });
+
+  it('keeps the order when the emails fail', async () => {
+    const fake = fakeClient(); service.mockReturnValue(fake.client);
+    emails.mockRejectedValueOnce(new Error('email down'));
+    expect((await placeOrder(input)).ok).toBe(true);
+    expect(fake.orderDelete).not.toHaveBeenCalled();
   });
 
   it('names the unavailable product and removes an unreserved order', async () => {
@@ -74,5 +87,6 @@ describe('guest checkout', () => {
     expect(await placeOrder(input)).toEqual({ ok: false, error: 'stock', product: 'Blue shirt' });
     expect(fake.orderDelete).toHaveBeenCalledWith('id', orderId);
     expect(fake.rpc).not.toHaveBeenCalledWith('release_reservation', expect.anything());
+    expect(emails).not.toHaveBeenCalled();
   });
 });

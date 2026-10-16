@@ -4,6 +4,9 @@ const { service, signature, parseWebhook } = vi.hoisted(() => ({
   service: vi.fn(), signature: vi.fn(), parseWebhook: vi.fn(),
 }));
 vi.mock('@plataforma/db/server', () => ({ createServiceClient: service }));
+vi.mock('next/server', async (original) => ({ ...await original<typeof import('next/server')>(),
+  after: (task: () => unknown) => { void task(); } }));
+vi.mock('../../../../lib/order-emails', () => ({ sendPaymentConfirmedEmail: vi.fn() }));
 vi.mock('@plataforma/payments', () => ({
   readMercadoPagoNotification: async () => ({ success: true,
     data: { type: 'payment', user_id: 42, data: { id: '789' } } }),

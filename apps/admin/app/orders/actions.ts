@@ -1,9 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { panelContext } from '../../lib/panel-data';
 import { nextOrderStatuses } from '../../lib/order-status';
+import { sendOrderUpdateEmail } from '../../lib/order-emails';
 
 const base = z.object({ storeId: z.uuid(), orderId: z.uuid() });
 
@@ -21,6 +23,9 @@ export async function changeOrderStatus(raw: unknown) {
   const { data, error } = await context.client.from('orders').update({ status: input.data.status })
     .eq('store_id', input.data.storeId).eq('id', input.data.orderId).eq('status', order.status).select('id').single();
   if (error || !data) return { error: 'save' as const };
+  const status = input.data.status;
+  if (status === 'shipped' || status === 'ready_for_pickup')
+    after(() => sendOrderUpdateEmail(context.client, input.data.storeId, input.data.orderId, status));
   revalidatePath('/orders');
   revalidatePath(`/orders/${input.data.orderId}`);
   return {};
@@ -50,6 +55,8 @@ export async function decideManualPayment(raw: unknown) {
   const { error } = await context.client.rpc('confirm_manual_payment', {
     p_payment_id: input.data.paymentId, p_approve: input.data.approve });
   if (error) return { error: 'save' as const };
+  if (input.data.approve)
+    after(() => sendOrderUpdateEmail(context.client, input.data.storeId, input.data.orderId, 'paid'));
   revalidatePath('/orders');
   revalidatePath(`/orders/${input.data.orderId}`);
   return {};

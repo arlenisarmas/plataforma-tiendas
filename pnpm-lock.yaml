@@ -123,6 +123,9 @@ importers:
       '@plataforma/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@plataforma/emails':
+        specifier: workspace:*
+        version: link:../../packages/emails
       '@plataforma/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
