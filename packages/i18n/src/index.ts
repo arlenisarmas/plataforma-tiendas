@@ -3,16 +3,19 @@ import adminEs419 from '../messages/es-419/admin.json';
 import storefrontEs419 from '../messages/es-419/storefront.json';
 import blocksEs419 from '../messages/es-419/blocks.json';
 import errorsEs419 from '../messages/es-419/errors.json';
+import emailsEs419 from '../messages/es-419/emails.json';
 import commonEsAr from '../messages/es-AR/common.json';
 import adminEsAr from '../messages/es-AR/admin.json';
 import storefrontEsAr from '../messages/es-AR/storefront.json';
 import blocksEsAr from '../messages/es-AR/blocks.json';
 import errorsEsAr from '../messages/es-AR/errors.json';
+import emailsEsAr from '../messages/es-AR/emails.json';
 import commonEn from '../messages/en/common.json';
 import adminEn from '../messages/en/admin.json';
 import storefrontEn from '../messages/en/storefront.json';
 import blocksEn from '../messages/en/blocks.json';
 import errorsEn from '../messages/en/errors.json';
+import emailsEn from '../messages/en/emails.json';
 
 export const locales = ['es-419', 'es-AR', 'en'] as const;
 export type Locale = (typeof locales)[number];
@@ -25,6 +28,7 @@ export const messages = {
     storefront: storefrontEs419,
     blocks: blocksEs419,
     errors: errorsEs419,
+    emails: emailsEs419,
   },
   'es-AR': {
     common: commonEsAr,
@@ -32,6 +36,7 @@ export const messages = {
     storefront: storefrontEsAr,
     blocks: blocksEsAr,
     errors: errorsEsAr,
+    emails: emailsEsAr,
   },
   en: {
     common: commonEn,
@@ -39,6 +44,7 @@ export const messages = {
     storefront: storefrontEn,
     blocks: blocksEn,
     errors: errorsEn,
+    emails: emailsEn,
   },
 } as const;
 

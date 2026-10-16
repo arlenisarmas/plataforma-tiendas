@@ -1,0 +1,22 @@
+{
+  "orderConfirmation": "Recibimos tu pedido #{number} en {store}",
+  "paymentConfirmed": "Confirmamos tu pago en {store}",
+  "orderReady": "Novedades sobre tu pedido #{number} en {store}",
+  "newOrder": "Nuevo pedido #{number} en {store}",
+  "teamInvitation": "Te invitaron al equipo de {store}",
+  "orderConfirmationHeading": "¡Recibimos tu pedido!",
+  "orderConfirmationBody": "El pedido #{number} ya está registrado. Si elegiste pago manual, sigue estas indicaciones.",
+  "paymentConfirmedHeading": "Tu pago está confirmado",
+  "paymentConfirmedBody": "Estamos preparando tu pedido #{number}.",
+  "pickupHeading": "Tu pedido está listo para retirar",
+  "shippedHeading": "Tu pedido está en camino",
+  "pickupBody": "Ya puedes pasar a retirar el pedido #{number}.",
+  "shippedBody": "Enviamos el pedido #{number}. Puedes ver los detalles abajo.",
+  "newOrderHeading": "Entró un pedido nuevo",
+  "newOrderBody": "Revisa el pedido #{number} para preparar el próximo paso.",
+  "teamInvitationHeading": "Te sumaron al equipo",
+  "teamInvitationBody": "Acepta la invitación para ayudar a gestionar la tienda.",
+  "viewOrder": "Ver mi pedido",
+  "acceptInvite": "Aceptar invitación",
+  "footer": "Este mensaje lo envió {store}."
+}
