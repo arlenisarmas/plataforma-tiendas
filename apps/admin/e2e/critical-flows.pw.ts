@@ -22,9 +22,10 @@ async function timed(name: string, budget: number, info: TestInfo, action: () =>
 test('six critical journeys work on mobile and desktop', async ({ page }, info) => {
   test.setTimeout(15 * 60_000);
   await page.goto('/login');
-  await page.getByLabel('Correo electrónico').fill('arle@ejemplo.com');
+  await page.getByLabel('Correo electrónico').first().fill('arle@ejemplo.com');
   await page.getByLabel('Contraseña').fill('demo1234');
   await page.getByRole('button', { name: 'Ingresar' }).click();
+  await expect(page).toHaveURL(/localhost:3001\/(\?.*)?$/);
 
   const storeStart = Date.now();
   const storeName = `Tienda E2E ${Date.now()}`;
@@ -114,7 +115,8 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.getByRole('link', { name: /#[0-9]+/ }).first().click();
     await expect(page).toHaveURL(new RegExp(`/orders/${orderId}`));
     await page.getByRole('button', { name: 'Confirmar pago' }).click();
-    await expect(page.getByRole('button', { name: 'Marcar como enviado' })).toBeVisible();
+    // The purchase uses pickup, so the next step is "ready for pickup" (shipping is not offered).
+    await expect(page.getByRole('button', { name: 'Marcar listo para retirar' })).toBeVisible();
     await audit(page);
   });
 
@@ -122,8 +124,8 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.goto('/orders');
     await page.getByRole('link', { name: /#[0-9]+/ }).first().click();
     await expect(page).toHaveURL(new RegExp(`/orders/${orderId}`));
-    await page.getByRole('button', { name: 'Marcar como enviado' }).click();
-    await expect(page.getByText('Enviado', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Marcar listo para retirar' }).click();
+    await expect(page.getByText('Listo para retirar', { exact: true }).first()).toBeVisible();
     await audit(page);
   });
 });
