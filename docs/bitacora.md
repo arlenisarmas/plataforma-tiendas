@@ -41,7 +41,7 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 | CI | Escenarios SQL, apps (lint/tipos/tests/build), Supabase real (regenera tipos solo), e2e de 6 flujos (móvil y escritorio), staging, capturas automáticas |
 | Supabase staging | Proyecto gratis en ca-central-1; migraciones automáticas al integrar en `main` vía pooler |
 | Supabase producción | Más adelante, São Paulo (sa-east-1) |
-| Vercel | Proyecto `tiendas-storefront` (tienda) creado y conectado a Che Peludos en staging. Falta el panel (`tiendas-admin`) |
+| Vercel | Tienda: https://tiendas-storefront.vercel.app · Panel: https://panel-tiendas-arle.vercel.app (ojo: `tiendas-admin.vercel.app` NO es nuestro, es de un tercero) |
 
 ## 5. Avance
 
@@ -53,9 +53,7 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 
 ## 6. Pendientes de Arle (cuando quiera)
 
-- **Supabase staging:** Data API → Exposed schemas → agregar `storefront` (sin esto la tienda en Vercel dice "no disponible").
-- **Vercel `tiendas-storefront`:** agregar `SUPABASE_SERVICE_ROLE_KEY`, `CART_COOKIE_SECRET` (texto inventado de 40+) y `NEXT_PUBLIC_STOREFRONT_URL` para que funcionen carrito y compra.
-- Crear el proyecto del panel en Vercel (`tiendas-admin`, carpeta `apps/admin`).
+- Copiar `PREVIEW_SECRET` y `REVALIDATE_SECRET` del panel a la tienda en Vercel (tienen que ser iguales).
 - Hacer privado el repo y proteger `main`.
 - Más adelante: credenciales de prueba de Mercado Pago, cuenta de Resend, dominio.
 
