@@ -9,7 +9,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const scale = Number.isInteger(candidate) && candidate >= 100 && candidate <= 150 ? candidate : 100;
   return (
     <html lang={locale} style={{ fontSize: `${scale}%` }}>
-      <body className="bg-white text-base text-slate-900">{children}</body>
+      <body data-locale={locale} className="bg-white text-base text-slate-900">{children}</body>
     </html>
   );
 }

@@ -33,5 +33,14 @@
   "saved": "Your changes are saved.",
   "saveError": "We couldn't save. Please try again.",
   "signOut": "Sign out",
-  "googleSoon": "Sign in with Google will be available later."
+  "googleSoon": "Sign in with Google will be available later.",
+  "navLabel": "Store sections",
+  "nav": { "home": "Home", "products": "Products", "orders": "Orders", "page": "My page", "customers": "Customers", "settings": "Settings" },
+  "selectStore": "Choose store", "openStore": "Open store",
+  "quickSearch": "What would you like to do?", "quickAddProduct": "Add product", "quickColors": "Change colors", "quickOrders": "See today's orders",
+  "checklistTitle": "Your store at 100%", "checklistCount": "{count} of 6 steps done", "completed": "Done", "pending": "Pending",
+  "checklist": { "logo": "Add logo", "product": "Add first product", "payment": "Set up payments", "shipping": "Set up shipping", "page": "Prepare home page", "publish": "Publish store" },
+  "today": "Today", "ordersToday": "{count} orders today", "notifications": "Notifications", "noNotifications": "No new notifications.",
+  "viewNotification": "View details", "markRead": "Mark as read", "sectionSoon": "This section is coming soon.",
+  "loading": "Preparing your store...", "loadError": "We couldn't show your store. Try again.", "retry": "Try again"
 }
