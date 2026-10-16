@@ -24,7 +24,7 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
   await page.goto('/login');
   await page.getByLabel('Correo electrónico').first().fill('arle@ejemplo.com');
   await page.getByLabel('Contraseña').fill('demo1234');
-  await page.getByRole('button', { name: 'Ingresar' }).click();
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
   await expect(page).toHaveURL(/localhost:3001\/(\?.*)?$/);
 
   const storeStart = Date.now();
@@ -35,7 +35,7 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.goto('/stores/new');
     await page.getByLabel('Nombre del negocio').fill(storeName);
     await expect(page.getByText('Esta dirección está disponible.')).toBeVisible();
-    storeSlug = await page.getByLabel('Dirección de la tienda').inputValue();
+    storeSlug = await page.getByLabel('Dirección de tu tienda').inputValue();
     for (let step = 0; step < 3; step++) await page.getByRole('button', { name: 'Siguiente' }).click();
     await page.getByRole('button', { name: 'Crear mi tienda' }).click();
     await expect(page.getByRole('heading', { name: 'Tu tienda al 100%' })).toBeVisible();
@@ -77,7 +77,7 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     const payment = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Cómo te pagan' }) });
     await payment.getByLabel('Titular').fill('Tienda de prueba');
     await payment.getByLabel('Banco').fill('Banco de prueba');
-    await payment.getByLabel('Alias o CBU').fill('tienda.demo');
+    await payment.getByLabel(/Alias o (CBU|número de cuenta)/).fill('tienda.demo');
     await payment.getByRole('button', { name: 'Guardar' }).click();
     await expect(payment.getByRole('status')).toHaveText('Guardado');
     await page.goto(`/publish?store=${storeId}`);
