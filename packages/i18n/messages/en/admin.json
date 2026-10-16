@@ -42,5 +42,8 @@
   "checklist": { "logo": "Add logo", "product": "Add first product", "payment": "Set up payments", "shipping": "Set up shipping", "page": "Prepare home page", "publish": "Publish store" },
   "today": "Today", "ordersToday": "{count} orders today", "notifications": "Notifications", "noNotifications": "No new notifications.",
   "viewNotification": "View details", "markRead": "Mark as read", "sectionSoon": "This section is coming soon.",
-  "loading": "Preparing your store...", "loadError": "We couldn't show your store. Try again.", "retry": "Try again"
+  "loading": "Preparing your store...", "loadError": "We couldn't show your store. Try again.", "retry": "Try again",
+  "media": { "title": "Your images", "choose": "Choose image", "upload": "Upload image", "camera": "Choose a picture or take one with your camera.",
+    "alt": "Image description (optional)", "suggestion": "For example: light wooden table", "invalid": "Choose an image under 10 MB and try again.",
+    "failed": "We couldn't upload the image. Try again.", "selected": "Image selected.", "empty": "No images yet. Upload your first one." }
 }

@@ -14,6 +14,7 @@ export default async function SectionPage({ params, searchParams }: {
     <main className="space-y-4 p-4 md:p-8">
       <h1 className="text-3xl font-bold">{t(`nav.${section}` as 'nav.products')}</h1>
       <p>{t('sectionSoon')}</p>
+      {section === 'page' && <a className="auth-primary" href={`/page/media?store=${context.selected.id}`}>{t('media.title')}</a>}
     </main>
   </PanelShell>;
 }
