@@ -1,11 +1,13 @@
 'use server';
 
-import { createTheme } from '@plataforma/blocks';
+import { createStoreTemplate } from '@plataforma/blocks';
+import { messages } from '@plataforma/i18n';
+import { z } from 'zod';
 import { isValidStoreSlug } from '@plataforma/core';
 import { userClient } from '../../../lib/server-client';
 import { validateImage } from '../../../lib/media-validation';
 import { storeSetupSchema } from '../../../lib/store-setup';
-import { adminText } from '../../../lib/locale';
+import { adminLocale } from '../../../lib/locale';
 
 export async function checkStoreSlug(slug: string): Promise<'disponible' | 'en_uso' | 'invalida'> {
   if (!isValidStoreSlug(slug)) return 'invalida';
@@ -35,24 +37,20 @@ export async function createStoreAction(form: FormData): Promise<{ storeId?: str
     if (error?.message.includes('LIMITE_DE_TIENDAS')) return { error: 'limit' };
     return { error: 'failed' };
   }
-  const theme = createTheme(input.data.palette);
-  const { error: themeError } = await client.from('stores').update({ theme_draft: theme }).eq('id', storeId);
-  const { error: pageError } = await client.from('pages').update({ draft_blocks: [{ id: crypto.randomUUID(), type: 'hero', version: 1,
-    variant: 'split', props: { title: input.data.name, align: 'left' } }] }).eq('store_id', storeId).eq('kind', 'home');
+  const locale = await adminLocale();
+  const sample = messages[locale].blocks.templates[input.data.industry];
+  const labels = messages[locale].admin.storeTemplate;
+  const template = createStoreTemplate(input.data.industry, input.data.name, {
+    ...sample, aboutTitle: labels.about, contactTitle: labels.contact,
+    faqTitle: labels.faq, productsTitle: labels.products,
+  }, input.data.palette);
+  const { error: themeError } = await client.from('stores').update({ theme_draft: template.theme }).eq('id', storeId);
+  const { error: pageError } = await client.from('pages').update({ draft_blocks: z.array(z.json()).parse(template.pages[0]?.blocks ?? []) })
+    .eq('store_id', storeId).eq('kind', 'home');
   if (themeError || pageError) return { storeId, error: 'failed' };
-  const t = await adminText();
-  const pages = [
-    { slug: 'sobre-nosotros', title: t('storeTemplate.about'), block: 'rich-text',
-      props: { title: t('storeTemplate.about'), body: t('storeTemplate.aboutBody') } },
-    { slug: 'contacto', title: t('storeTemplate.contact'), block: 'contact',
-      props: { title: t('storeTemplate.contact') } },
-    { slug: 'preguntas-frecuentes', title: t('storeTemplate.faq'), block: 'faq',
-      props: { title: t('storeTemplate.faq'), items: [] } },
-  ];
-  const { error: templatesError } = await client.from('pages').insert(pages.map((page, index) => ({
+  const { error: templatesError } = await client.from('pages').insert(template.pages.slice(1).map((page, index) => ({
     store_id: storeId, kind: 'custom' as const, slug: page.slug, title: page.title,
-    show_in_nav: true, nav_position: index + 1, draft_blocks: [{ id: crypto.randomUUID(),
-      type: page.block, version: 1, props: page.props }],
+    show_in_nav: true, nav_position: index + 1, draft_blocks: z.array(z.json()).parse(page.blocks),
   })));
   if (templatesError) return { storeId, error: 'failed' };
   const logo = form.get('logo');

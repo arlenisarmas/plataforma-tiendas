@@ -87,5 +87,12 @@
   "contactPhone": "Phone",
   "contactEmail": "Email",
   "contactAddress": "Address",
-  "contactHours": "Hours"
+  "contactHours": "Hours",
+  "templates": {
+    "mascotas": { "intro": "Everything for your four-legged friends.", "about": "We love caring for the companions who brighten your home. Share your story here.", "contact": "Hi, I'd like to know more about your pet products.", "faqQuestion": "How do I choose the right product?", "faqAnswer": "Message us and we'll help you find the best fit for your pet." },
+    "carpinteria-muebles": { "intro": "Thoughtful pieces for spaces you love.", "about": "Every piece has a story. Share the materials and craft behind yours.", "contact": "Hi, I'd like to ask about a piece of furniture.", "faqQuestion": "Can I request a custom piece?", "faqAnswer": "Send us your idea and we'll talk through the options." },
+    "ropa-accesorios": { "intro": "Find pieces that feel like you.", "about": "We believe in expressing your own style. Share the story behind your brand.", "contact": "Hi, I'd like to ask about an item.", "faqQuestion": "How do I choose my size?", "faqAnswer": "Message us and we'll help with measurements." },
+    "comida-casera": { "intro": "Homemade flavors to share.", "about": "We cook with care and good ingredients. Share the story behind your recipes.", "contact": "Hi, I'd like to ask about your food.", "faqQuestion": "How early should I place an order?", "faqAnswer": "Message us and we'll arrange the date you need." },
+    "general": { "intro": "Welcome to our store. See what we have for you.", "about": "Every business has a story. Share yours here.", "contact": "Hi, I'd like to ask a question.", "faqQuestion": "How can I get in touch?", "faqAnswer": "Message us and we'll get back to you soon." }
+  }
 }
