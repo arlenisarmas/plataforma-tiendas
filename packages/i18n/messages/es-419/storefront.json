@@ -2,5 +2,6 @@
   "title": "Tu tienda en internet",
   "description": "Pronto podrás conocer nuestros productos.",
   "products": "Productos",
-  "unavailable": "Esta tienda todavía no está disponible."
+  "unavailable": "Esta tienda todavía no está disponible.",
+  "catalog": { "search": "Buscar productos", "searchButton": "Buscar", "all": "Todos", "sort": "Ordenar", "newest": "Más nuevos", "name": "Nombre", "priceLow": "Menor precio", "empty": "No encontramos productos.", "outOfStock": "Sin stock", "add": "Agregar al carrito", "added": "Agregado al carrito", "share": "Compartir por WhatsApp", "options": "Elegí una opción", "category": "Categoría", "description": "Descripción" }
 }
