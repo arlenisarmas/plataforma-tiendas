@@ -166,7 +166,7 @@ export function StoreWizard({
         );
         return;
       }
-      router.push(`/build?store=${result.storeId}`);
+      router.push(`/build?store=${result.storeId}&step=cover`);
     });
 
   const fieldClass = 'auth-input';
