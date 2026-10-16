@@ -14,7 +14,10 @@
     "test": "turbo test",
     "test:e2e": "pnpm --filter @plataforma/storefront test:e2e",
     "format": "prettier --write .",
-    "db:test": "bash supabase/tests/escenarios/ejecutar.sh"
+    "db:test": "bash supabase/tests/escenarios/ejecutar.sh",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local --schema public,storefront > packages/db/src/database.types.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

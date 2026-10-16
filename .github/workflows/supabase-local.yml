@@ -1,0 +1,52 @@
+name: Supabase local (migraciones, seed y tipos)
+
+# Levanta Supabase con Docker en GitHub (no hace falta Docker en la PC de desarrollo),
+# aplica migraciones + seed reales y verifica que los tipos commiteados estén al día.
+# Si los tipos cambiaron, el job falla y deja los tipos nuevos como artefacto
+# ("database-types") para commitearlos en packages/db/src/database.types.ts.
+
+on:
+  pull_request:
+    paths: ['supabase/**', 'packages/db/src/database.types.ts', '.github/workflows/supabase-local.yml']
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'packages/db/src/database.types.ts']
+  workflow_dispatch:
+
+concurrency:
+  group: supabase-local-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  supabase:
+    name: Supabase real (migraciones, seed y tipos)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+      - name: Levantar base de datos local
+        run: supabase db start
+      - name: Aplicar migraciones y seed desde cero
+        run: supabase db reset --local
+      - name: Verificar datos de ejemplo
+        run: |
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -Atc \
+            "select slug || ' ' || status from public.stores order by slug" | tee tiendas.txt
+          grep -q "chepeludos published" tiendas.txt
+          grep -q "carpinteria-del-sur draft" tiendas.txt
+      - name: Generar tipos de TypeScript
+        run: supabase gen types typescript --local --schema public,storefront > database.types.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: database-types
+          path: database.types.ts
+      - name: Comparar con los tipos commiteados
+        run: |
+          if ! diff -u packages/db/src/database.types.ts database.types.ts > tipos.diff; then
+            echo "::error::Los tipos de la base cambiaron. Descargá el artefacto 'database-types' y reemplazá packages/db/src/database.types.ts (o corré 'pnpm db:types' con Supabase local)."
+            head -60 tipos.diff
+            exit 1
+          fi
+          echo "Tipos al día ✅"

@@ -8,3 +8,4 @@ docs
 tareas
 AGENTS.md
 .github/pull_request_template.md
+packages/db/src/database.types.ts
