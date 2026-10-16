@@ -50,7 +50,7 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.getByLabel('Precio', { exact: true }).fill('15.000,50');
     await page.getByLabel('Unidades disponibles').fill('5');
     await page.getByLabel('Subir imagen').setInputFiles({ name: 'foto.png', mimeType: 'image/png', buffer: photo });
-    await page.getByRole('button', { name: 'Subir imagen' }).click();
+    await page.locator('button', { hasText: 'Subir imagen' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Imagen elegida.' })).toBeVisible();
     await page.getByRole('button', { name: 'Guardar y publicar' }).click();
     await expect(page.getByText('Producto guardado.')).toBeVisible();
@@ -62,7 +62,7 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     await page.getByRole('button', { name: 'Portada' }).first().click();
     await page.getByLabel('Título', { exact: true }).fill('Portada de prueba');
     await page.getByLabel('Subir imagen').setInputFiles({ name: 'portada.png', mimeType: 'image/png', buffer: photo });
-    await page.getByRole('button', { name: 'Subir imagen' }).click();
+    await page.locator('button', { hasText: 'Subir imagen' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Guardado' })).toBeVisible();
     await page.getByRole('button', { name: 'Publicar', exact: true }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Tus cambios ya están en tu tienda' })).toBeVisible();
