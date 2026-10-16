@@ -35,7 +35,7 @@ export function MediaPicker({ storeId, folder, initial, labels, name = 'assetId'
   return <div className="space-y-4">
     <div className="rounded-xl border border-slate-300 p-4">
       <label className="block font-semibold" htmlFor="media-file">{labels.upload}</label>
-      <input id="media-file" className="auth-input" type="file" accept="image/*" capture="environment"
+      <input id="media-file" className="auth-input" type="file" accept="image/*"
         onChange={(event) => { const next = event.target.files?.[0]; setFile(next); setAlt(next?.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') ?? ''); setError(''); }} />
       <p className="mt-1 text-sm">{labels.camera}</p>
       <label className="mt-3 block font-semibold" htmlFor="media-alt">{labels.alt}</label>
