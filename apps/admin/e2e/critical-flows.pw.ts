@@ -29,7 +29,10 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
   await page.getByLabel('Correo electrónico').first().fill('arle@ejemplo.com');
   await page.getByLabel('Contraseña').fill('demo1234');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page).toHaveURL(/localhost:3001\/(\?.*)?$/);
+  // Arle administra la plataforma: entra a la consola (T-034).
+  await expect(page).toHaveURL(/localhost:3001\/platform$/);
+  await expect(page.getByRole('heading', { name: /Hola, / })).toBeVisible();
+  await audit(page);
 
   const storeStart = Date.now();
   const storeName = `Tienda E2E ${Date.now()}`;
@@ -42,7 +45,8 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     storeSlug = await page.getByLabel('Dirección de tu tienda').inputValue();
     for (let step = 0; step < 3; step++) await page.getByRole('button', { name: 'Siguiente' }).click();
     await page.getByRole('button', { name: 'Crear mi tienda' }).click();
-    await expect(page.getByRole('heading', { name: 'Tu tienda al 100%' })).toBeVisible();
+    // Al crear la tienda se entra directo al armado guiado (T-038).
+    await expect(page.getByRole('heading', { name: 'Tu portada' })).toBeVisible({ timeout: 20_000 });
     storeId = new URL(page.url()).searchParams.get('store') ?? '';
     expect(storeId).toMatch(/^[0-9a-f-]{36}$/i);
     await audit(page);
@@ -139,5 +143,48 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     // The detail header shows "<status> · <email>".
     await expect(page.getByText(/^Listo para retirar ·/)).toBeVisible({ timeout: 15_000 });
     await audit(page);
+  });
+});
+
+test('the admin invites a person who sets a password and lands in My space', async ({ page }) => {
+  test.setTimeout(5 * 60_000);
+  await page.goto('/login');
+  await page.getByLabel('Correo electrónico').first().fill('arle@ejemplo.com');
+  await page.getByLabel('Contraseña').fill('demo1234');
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+  await expect(page).toHaveURL(/\/platform$/);
+
+  const email = `invitada-${Date.now()}-${test.info().project.name}@example.test`;
+  let link = '';
+  await test.step('Invitar a una persona que tendrá su propia tienda', async () => {
+    await page.goto('/platform/invite');
+    await page.getByLabel('Nombre', { exact: true }).fill('Sofía');
+    await page.getByLabel('Correo electrónico').fill(email);
+    await page.getByRole('button', { name: 'Enviar invitación' }).click();
+    const status = page.getByRole('status').filter({ hasText: 'Invitación enviada' });
+    await expect(status).toBeVisible({ timeout: 20_000 });
+    link = await status.getByRole('textbox').inputValue();
+    expect(link).toMatch(/\/join\/[A-Za-z0-9_-]{32,}$/);
+    await audit(page);
+  });
+
+  await test.step('La persona crea su contraseña y entra a Mi espacio', async () => {
+    await page.context().clearCookies();
+    await page.goto(new URL(link).pathname);
+    await expect(page.getByRole('heading', { name: 'Te invitaron' })).toBeVisible();
+    await audit(page);
+    await page.getByLabel('Elige una contraseña').fill('clave-segura-123');
+    await page.getByRole('button', { name: 'Crear mi acceso' }).click();
+    await expect(page.getByRole('heading', { name: 'Hola, Sofía' })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole('link', { name: /Nuevo proyecto/ })).toBeVisible();
+    await audit(page);
+  });
+
+  await test.step('Una persona sin permiso no ve la consola y el registro abierto está cerrado', async () => {
+    await page.goto('/platform');
+    await expect(page.getByRole('alert')).toContainText('No tienes permiso');
+    await page.context().clearCookies();
+    await page.goto('/signup');
+    await expect(page.getByRole('status')).toContainText('solo por invitación');
   });
 });
