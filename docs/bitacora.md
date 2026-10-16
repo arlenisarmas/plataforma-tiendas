@@ -38,23 +38,25 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 | Pieza | Estado |
 |---|---|
 | Repo | github.com/arlenisarmas/plataforma-tiendas (público, pasar a privado) |
-| CI | Escenarios SQL (58), apps (lint/tipos/tests/build), Supabase real (regenera tipos solo), staging |
+| CI | Escenarios SQL, apps (lint/tipos/tests/build), Supabase real (regenera tipos solo), e2e de 6 flujos (móvil y escritorio), staging, capturas automáticas |
 | Supabase staging | Proyecto gratis en ca-central-1; migraciones automáticas al integrar en `main` vía pooler |
 | Supabase producción | Más adelante, São Paulo (sa-east-1) |
-| Vercel | Pendiente (gratis) para ver la plataforma online |
+| Vercel | Proyecto `tiendas-storefront` (tienda) creado y conectado a Che Peludos en staging. Falta el panel (`tiendas-admin`) |
 
 ## 5. Avance
 
 | Lote | Tareas | Estado |
 |---|---|---|
-| 1–3 | T-001 a T-020, T-026 (base, bloques, editor, productos, stock, tienda pública, asistente de alta) | ✅ Integrados (21/31) |
-| 4 | T-021 Carrito, T-022 Pagos, T-023 Compra, T-024 Pedidos, T-025 Emails, T-027 Clientes y equipo, T-028 Publicar y ajustes, T-030 Seguridad y rendimiento, T-031 e2e | 🔨 En curso (sin credenciales reales: Mercado Pago y emails con dobles de prueba) |
+| 1–3 | T-001 a T-020, T-026 (base, bloques, editor, productos, stock, tienda pública, asistente de alta) | ✅ Integrados |
+| 4 | T-021 Carrito, T-022 Pagos, T-023 Compra, T-024 Pedidos, T-025 Emails, T-027 Clientes y equipo, T-028 Publicar y ajustes, T-030 Seguridad y rendimiento, T-031 e2e | ✅ Integrado (PR #41). Sin credenciales reales: Mercado Pago y emails con dobles de prueba. Claude terminó T-025 (integración) y T-031 (e2e en verde) cuando Codex se quedó sin tokens |
 | — | T-029 Dominios propios | ⏸ Necesita dominio y Vercel (Arle) |
 
 ## 6. Pendientes de Arle (cuando quiera)
 
+- **Supabase staging:** Data API → Exposed schemas → agregar `storefront` (sin esto la tienda en Vercel dice "no disponible").
+- **Vercel `tiendas-storefront`:** agregar `SUPABASE_SERVICE_ROLE_KEY`, `CART_COOKIE_SECRET` (texto inventado de 40+) y `NEXT_PUBLIC_STOREFRONT_URL` para que funcionen carrito y compra.
+- Crear el proyecto del panel en Vercel (`tiendas-admin`, carpeta `apps/admin`).
 - Hacer privado el repo y proteger `main`.
-- Crear cuenta de Vercel (gratis) para ver la plataforma.
 - Más adelante: credenciales de prueba de Mercado Pago, cuenta de Resend, dominio.
 
 ## 7. Para la auditoría de arquitectura
@@ -66,3 +68,6 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 - El token de vista previa lleva el JWT del usuario (cifrado): revisar.
 - Links a categoría usan uuid: pasar a slug.
 - Volver a sumar `@vitest/coverage-v8`.
+- Compra no atómica (varias escrituras con compensación): pasar a RPC `place_order`.
+- `orders.locale` usa el valor por defecto en vez del idioma de la tienda.
+- Registro de correos enviados para evitar duplicados más allá de las 24 h de idempotencia de Resend.
