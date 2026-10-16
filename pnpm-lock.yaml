@@ -56,6 +56,9 @@ importers:
       '@plataforma/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@plataforma/payments':
+        specifier: workspace:*
+        version: link:../../packages/payments
       '@plataforma/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -108,9 +111,15 @@ importers:
       '@plataforma/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@plataforma/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@plataforma/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@plataforma/payments':
+        specifier: workspace:*
+        version: link:../../packages/payments
       next:
         specifier: 16.4.1
         version: 16.4.1(@babel/core@7.29.7(supports-color@7.2.0))(@playwright/test@1.64.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -230,10 +239,20 @@ importers:
         version: link:../config
 
   packages/payments:
+    dependencies:
+      '@plataforma/core':
+        specifier: workspace:*
+        version: link:../core
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@plataforma/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^24.10.0
+        version: 24.19.2
 
   packages/ui:
     dependencies:

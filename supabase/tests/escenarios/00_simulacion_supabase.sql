@@ -25,4 +25,7 @@ create schema vault;
 create table vault.secrets (id uuid primary key default gen_random_uuid(), name text, secret text);
 create function vault.create_secret(new_secret text, new_name text default null) returns uuid language sql as
 $$ insert into vault.secrets(secret, name) values (new_secret, new_name) returning id $$;
+create function vault.update_secret(secret_id uuid, new_secret text) returns void language sql as
+$$ update vault.secrets set secret = new_secret where id = secret_id $$;
+create view vault.decrypted_secrets as select id, secret as decrypted_secret from vault.secrets;
 grant usage on schema public to anon, authenticated, service_role;

@@ -701,6 +701,15 @@ isOneToOne: false
 "get_order_for_buyer":
 { Args: { "p_order_id": string,"p_token": string }; Returns: Json
                            },
+"get_payment_secret":
+{ Args: { "p_method_id": string }; Returns: string | null
+                           },
+"set_payment_secret":
+{ Args: { "p_method_id": string,"p_secret": string }; Returns: undefined
+                           },
+"clear_payment_secret":
+{ Args: { "p_method_id": string }; Returns: undefined
+                           },
 "is_platform_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },

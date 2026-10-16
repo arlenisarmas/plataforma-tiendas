@@ -62,16 +62,17 @@ function PaymentForm({ storeId, labels }: { storeId: string; labels: Labels }) {
   </form>;
 }
 
-export function SettingsForms({ storeId, labels, shipping, methods }: { storeId: string; labels: Labels;
-  shipping: Shipping[]; methods: Method[] }) {
+export function SettingsForms({ storeId, labels, shipping, methods, mercadoPagoConnected }: { storeId: string; labels: Labels;
+  shipping: Shipping[]; methods: Method[]; mercadoPagoConnected: boolean }) {
   return <div className="space-y-8"><section className="space-y-3"><h2 className="text-2xl font-semibold">{labels.shipping}</h2>
     {shipping.map((item) => <ShippingForm key={item.id} storeId={storeId} labels={labels} initial={item} />)}
     <ShippingForm key={`new-${shipping.length}`} storeId={storeId} labels={labels} />
   </section><section className="space-y-3"><h2 className="text-2xl font-semibold">{labels.payment}</h2>
     {methods.map((method) => <p key={method} className="rounded border p-3">{optionsName(method, labels)} — {labels.configured}</p>)}
     <PaymentForm storeId={storeId} labels={labels} />
-    <div className="rounded-xl border p-4"><button disabled className="min-h-11 rounded border px-4 opacity-50">
-      {labels.mercadoPago}</button><p>{labels.comingSoon}</p></div>
+    <div className="rounded-xl border p-4">{mercadoPagoConnected ? <p>{labels.mercadoPago} — {labels.configured}</p> :
+      <a className="inline-flex min-h-11 items-center rounded border px-4" href={`/api/payments/mercadopago?store=${storeId}`}>
+        {labels.mercadoPago}</a>}</div>
   </section></div>;
 }
 

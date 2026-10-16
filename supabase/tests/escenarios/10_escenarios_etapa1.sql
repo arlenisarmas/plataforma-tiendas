@@ -221,5 +221,23 @@ reset role;
 delete from public.stores where id = t.v('SB');
 select t.ok('borrado en cascada de una tienda');
 
+-- 14. Vault de pagos: RPC solo para service_role --------------------------------
+set role service_role;
+insert into public.store_payment_methods (store_id, provider, display_name)
+  values (t.v('SA'), 'mercadopago', 'Mercado Pago');
+insert into t.ctx select 'MP_A', id from public.store_payment_methods
+  where store_id = t.v('SA') and provider = 'mercadopago';
+select public.set_payment_secret(t.v('MP_A'), 'sample-value');
+select t.eq('service_role lee secreto de Vault', public.get_payment_secret(t.v('MP_A')), 'sample-value');
+select public.set_payment_secret(t.v('MP_A'), 'replaced-value');
+select t.eq('service_role actualiza el mismo secreto', public.get_payment_secret(t.v('MP_A')), 'replaced-value');
+select public.clear_payment_secret(t.v('MP_A'));
+select t.eq('desconectar borra el secreto', public.get_payment_secret(t.v('MP_A')), null::text);
+set role anon;
+select t.expect_error('anon no lee Vault', format('select public.get_payment_secret(%L)', t.v('MP_A')), 'permission denied');
+set role authenticated;
+select t.expect_error('authenticated no escribe Vault',
+  format('select public.set_payment_secret(%L, %L)', t.v('MP_A'), 'sample-value'), 'permission denied');
+
 reset role;
 \echo '==== TODAS LAS PRUEBAS PASARON ===='
