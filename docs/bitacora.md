@@ -49,10 +49,21 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 |---|---|---|
 | 1–3 | T-001 a T-020, T-026 (base, bloques, editor, productos, stock, tienda pública, asistente de alta) | ✅ Integrados |
 | 4 | T-021 Carrito, T-022 Pagos, T-023 Compra, T-024 Pedidos, T-025 Emails, T-027 Clientes y equipo, T-028 Publicar y ajustes, T-030 Seguridad y rendimiento, T-031 e2e | ✅ Integrado (PR #41). Sin credenciales reales: Mercado Pago y emails con dobles de prueba. Claude terminó T-025 (integración) y T-031 (e2e en verde) cuando Codex se quedó sin tokens |
+| 5 | T-033 Permisos e invitaciones de plataforma, T-037 Estilo de consola oscura, T-032 Mi espacio, T-034 Consola de plataforma, T-035 Acceso solo por invitación, T-036 Actividad y horarios, T-038 Armado guiado | ✅ Integrado (PR #49). Hecho por Claude (Codex sin tokens) |
 | — | T-029 Dominios propios | ⏸ Necesita dominio y Vercel (Arle) |
+
+### Cómo funciona desde el Lote 5
+
+- **Ingreso:** solo por invitación (no hay registro abierto). La administradora entra y cae en la **Consola** (`/platform`): indicadores, quién está trabajando ahora, actividad, tiendas, personas y permisos, horarios (semana/mes, descarga CSV) e invitaciones.
+- **Invitar:** Consola → Invitar persona. Se elige si puede crear sus propias tiendas y cuántas (cupo), o se le crea una tienda ya armada. Llega un link `/join/<código>` donde la persona elige su contraseña.
+- **Personas invitadas:** caen en **Mi espacio**: solo sus proyectos, su cupo y el botón «Nuevo proyecto» con el asistente guiado y vista previa en vivo; después siguen el **armado guiado** (`/build`): portada, productos, pagos y envíos, contacto, abrir la tienda.
+- **Pausar:** se puede pausar una persona (pierde acceso) o una tienda.
+- En staging, la cuenta de ejemplo `arle@ejemplo.com` es la administradora (workflow «Datos de ejemplo en staging»).
 
 ## 6. Pendientes de Arle (cuando quiera)
 
+- En Vercel, proyecto de la tienda (`tiendas-storefront`): agregar `NEXT_PUBLIC_ADMIN_URL=https://panel-tiendas-arle.vercel.app` (vista previa del armado guiado).
+- En Supabase → Authentication → Sign In / Providers: apagar «Allow new users to sign up» (el ingreso es solo por invitación).
 - Copiar `PREVIEW_SECRET` y `REVALIDATE_SECRET` del panel a la tienda en Vercel (tienen que ser iguales).
 - Hacer privado el repo y proteger `main`.
 - Más adelante: credenciales de prueba de Mercado Pago, cuenta de Resend, dominio.
