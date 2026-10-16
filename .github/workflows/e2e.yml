@@ -45,7 +45,7 @@ jobs:
           rm supabase-local.env
       - run: pnpm --filter @plataforma/admin exec playwright install --with-deps chromium
       - name: Probar seis recorridos en móvil y escritorio
-        run: pnpm --filter @plataforma/admin exec playwright test e2e/critical-flows.pw.ts
+        run: pnpm --filter @plataforma/admin exec playwright test e2e/critical-flows.pw.ts --reporter=github,list
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
