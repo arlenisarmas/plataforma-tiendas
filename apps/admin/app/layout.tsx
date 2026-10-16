@@ -1,7 +1,14 @@
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { cookies } from 'next/headers';
+import { messages } from '@plataforma/i18n';
 import { adminLocale } from '../lib/locale';
 import './globals.css';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const title = messages[await adminLocale()].admin.metaTitle;
+  return { title: { default: title, template: `%s · ${title}` } };
+}
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await adminLocale();

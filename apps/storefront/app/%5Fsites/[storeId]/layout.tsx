@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { headers } from 'next/headers';
@@ -8,6 +9,13 @@ import { catalogLabels } from '../../../lib/catalog-ui';
 import { z } from 'zod';
 import { currentCart } from '../../../lib/cart-server';
 import { isLocale, messages } from '@plataforma/i18n';
+
+export async function generateMetadata({ params }: { params: Promise<{ storeId: string }> }): Promise<Metadata> {
+  const { storeId } = await params;
+  if (!/^[0-9a-f-]{36}$/i.test(storeId)) return {};
+  const store = (await readStorefront('stores', storeSchema, { id: `eq.${storeId}`, limit: '1' }, [`store:${storeId}`]))[0];
+  return store ? { title: { default: store.name, template: `%s · ${store.name}` } } : {};
+}
 
 export default async function SiteLayout({ children, params }: { children: ReactNode; params: Promise<{ storeId: string }> }) {
   const { storeId } = await params;
