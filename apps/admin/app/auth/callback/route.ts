@@ -3,8 +3,9 @@ import { createServerClient } from '@plataforma/db';
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
-  const destination = request.nextUrl.searchParams.get('next') === '/reset/new'
-    ? '/reset/new' : request.nextUrl.searchParams.get('first') === '1' ? '/welcome' : '/';
+  const next = request.nextUrl.searchParams.get('next');
+  const destination = next === '/reset/new' || (next && /^\/invite\/[A-Za-z0-9_-]{32,100}$/.test(next))
+    ? next : request.nextUrl.searchParams.get('first') === '1' ? '/welcome' : '/';
   if (!code) return NextResponse.redirect(new URL('/login?error=1', request.url));
   const response = NextResponse.redirect(new URL(destination, request.url));
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

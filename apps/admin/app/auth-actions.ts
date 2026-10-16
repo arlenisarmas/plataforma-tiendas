@@ -9,6 +9,10 @@ import { chooseGuide, saveProfile, sendMagicLink, sendPasswordReset, signIn, sig
 function origin() { return process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001'; }
 function fields(form: FormData) { return Object.fromEntries(form.entries()); }
 function authError(): never { redirect('/login?error=1'); }
+function safeInvitationPath(value: FormDataEntryValue | null): string | null {
+  const parsed = z.string().regex(/^\/invite\/[A-Za-z0-9_-]{32,100}$/).safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
 
 export async function loginAction(form: FormData) {
   const client = await userClient();
@@ -21,7 +25,7 @@ export async function loginAction(form: FormData) {
     store.set('text-scale', String(profile.text_scale), { path: '/', sameSite: 'lax' });
     store.set('admin-locale', profile.locale, { path: '/', sameSite: 'lax' });
   }
-  redirect('/');
+  redirect(safeInvitationPath(form.get('next')) ?? '/');
 }
 
 export async function signupAction(form: FormData) {
@@ -31,7 +35,10 @@ export async function signupAction(form: FormData) {
 }
 
 export async function magicAction(form: FormData) {
-  const result = await sendMagicLink(await userClient(), fields(form), `${origin()}/auth/callback`).catch(authError);
+  const next = safeInvitationPath(form.get('next'));
+  const callback = new URL(`${origin()}/auth/callback`);
+  if (next) callback.searchParams.set('next', next);
+  const result = await sendMagicLink(await userClient(), fields(form), callback.toString()).catch(authError);
   if (result.error) authError();
   redirect('/login?sent=1');
 }
