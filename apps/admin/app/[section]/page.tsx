@@ -16,6 +16,7 @@ export default async function SectionPage({ params, searchParams }: {
       <p>{t('sectionSoon')}</p>
       {section === 'page' && <div className="flex flex-wrap gap-3">
         <a className="auth-primary" href={`/page/edit?store=${context.selected.id}`}>{t('editor.title')}</a>
+        <a className="auth-secondary" href={`/page/pages?store=${context.selected.id}`}>{t('editor.pages')}</a>
         <a className="auth-secondary" href={`/page/media?store=${context.selected.id}`}>{t('media.title')}</a>
       </div>}
     </main>

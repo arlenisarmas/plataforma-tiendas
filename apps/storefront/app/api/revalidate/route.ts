@@ -22,8 +22,8 @@ export async function POST(request: Request) {
   const parsed = requestSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid tags' }, { status: 400 });
   const { storeId, pageId, hostname } = parsed.data;
-  if (storeId) revalidateTag(`store:${storeId}`, 'max');
-  if (pageId) revalidateTag(`page:${pageId}`, 'max');
-  if (hostname) revalidateTag(`domain:${hostname}`, 'max');
+  if (storeId) revalidateTag(`store:${storeId}`, { expire: 0 });
+  if (pageId) revalidateTag(`page:${pageId}`, { expire: 0 });
+  if (hostname) revalidateTag(`domain:${hostname}`, { expire: 0 });
   return NextResponse.json({ revalidated: true });
 }

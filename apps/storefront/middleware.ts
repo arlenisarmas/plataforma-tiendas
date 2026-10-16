@@ -13,4 +13,4 @@ export async function middleware(request: NextRequest) {
   return NextResponse.rewrite(url);
 }
 
-export const config = { matcher: ['/((?!_next|api|_sites|favicon.ico|robots.txt|sitemap.xml).*)'] };
+export const config = { matcher: ['/((?!_next|api|preview|_sites|favicon.ico|robots.txt|sitemap.xml).*)'] };
