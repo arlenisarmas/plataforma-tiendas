@@ -11,7 +11,11 @@ const quantitySchema = addSchema.pick({ storeId: true, variantId: true }).extend
 
 async function saveCart(storeId: string, items: Awaited<ReturnType<typeof currentCart>>['items']) {
   const secret = process.env.CART_COOKIE_SECRET;
-  if (!secret) return false;
+  if (!secret || secret.length < 32) {
+    // Configuration problem, not a buyer problem: leave a trace for whoever runs the store.
+    console.error('Cart unavailable: CART_COOKIE_SECRET is missing or shorter than 32 characters');
+    return false;
+  }
   const jar = await cookies();
   jar.set(CART_COOKIE, signCart({ storeId, items }, secret), { httpOnly: true, sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 60 * 60 * 24 * 30 });
@@ -24,7 +28,10 @@ export async function addCartItem(raw: unknown): Promise<{ error?: 'invalid' | '
   const { storeId, productId, variantId } = parsed.data;
   const variant = (await readStorefront('variants', variantSchema, { store_id: `eq.${storeId}`,
     product_id: `eq.${productId}`, id: `eq.${variantId}`, limit: '1' }, [], true))[0];
-  if (!variant?.is_available) return { error: 'unavailable' };
+  if (!variant?.is_available) {
+    console.error('Cart add rejected: variant unavailable', { storeId, variantId });
+    return { error: 'unavailable' };
+  }
   const cart = await currentCart(storeId);
   if (cart.items.length >= 50 && !cart.items.some((item) => item.variantId === variantId)) return { error: 'full' };
   const next = putItem(cart, productId, variantId, 1);
