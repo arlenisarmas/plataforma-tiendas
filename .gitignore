@@ -5,6 +5,7 @@ node_modules/
 out/
 dist/
 build/
+!apps/*/app/build/
 .turbo/
 coverage/
 playwright-report/
