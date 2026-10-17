@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { z } from 'zod';
 import { fromMinor, type CurrencyCode } from '@plataforma/core';
 import { adminText } from '../../lib/locale';
-import { buildSteps, stepDone, type BuildStep } from '../../lib/build-blocks';
+import { buildSteps, headerChoice, onboardingSchema, resumeStep, stepDone, type BuildStep } from '../../lib/build-blocks';
 import { dashboardData } from '../../lib/panel-data';
 import { createPreviewToken } from '../../lib/preview-token';
 import { socialLink } from '../../lib/store-details-data';
@@ -15,12 +15,21 @@ import { SettingsForms } from '../settings/settings-forms';
 import { StoreDetails } from '../settings/store-details';
 import { BuildPreview } from './build-preview';
 import { CoverStep } from './cover-step';
+import { HeaderStep } from './header-step';
+import { LogoStep } from './logo-step';
+import { ProductsLayout } from './products-layout';
+import { RememberStep } from './remember-step';
 
 const heroBlock = z.object({ type: z.literal('hero'), variant: z.string().optional(),
   props: z.object({ title: z.string().optional(), subtitle: z.string().optional(),
     image: z.object({ assetId: z.uuid() }).optional() }).loose() }).loose();
 
 function previewExpiry() { return Date.now() + 15 * 60_000; }
+
+function productsVariant(blocks: unknown[]): 'grid' | 'carousel' | 'featured-list' {
+  const block = blocks.find((item) => typeof item === 'object' && item !== null && (item as { type?: unknown }).type === 'featured-products') as { variant?: unknown } | undefined;
+  return block?.variant === 'carousel' || block?.variant === 'featured-list' ? block.variant : 'grid';
+}
 
 /** Recorrido guiado para armar la tienda paso a paso (T-038). */
 export default async function BuildPage({ searchParams }: { searchParams: Promise<{ store?: string; step?: string; saved?: string; result?: string }> }) {
@@ -29,16 +38,19 @@ export default async function BuildPage({ searchParams }: { searchParams: Promis
   const { client, selected } = data;
   const storeId = selected.id;
   const [storeRow, homePage, productCount] = await Promise.all([
-    client.from('stores').select('slug,currency,default_locale,contact,theme_draft').eq('id', storeId).single(),
+    client.from('stores').select('slug,currency,default_locale,contact,theme_draft,onboarding').eq('id', storeId).single(),
     client.from('pages').select('id,draft_blocks').eq('store_id', storeId).eq('kind', 'home').single(),
     client.from('products').select('id', { count: 'exact', head: true }).eq('store_id', storeId).eq('status', 'active'),
   ]);
   if (storeRow.error || !storeRow.data) throw storeRow.error ?? new Error('Store unavailable');
   const contact = z.record(z.string(), z.unknown()).catch({}).parse(storeRow.data.contact);
   const hasContact = ['whatsapp', 'email', 'phone'].some((key) => typeof contact[key] === 'string' && (contact[key] as string).trim() !== '');
-  const done = Object.fromEntries(buildSteps.map((step) => [step, stepDone(step, data.checks, hasContact)])) as Record<BuildStep, boolean>;
+  const onboarding = onboardingSchema.parse(storeRow.data.onboarding);
+  const done = Object.fromEntries(buildSteps.map((step) => [step, stepDone(step, data.checks, hasContact, onboarding)])) as Record<BuildStep, boolean>;
   const requested = buildSteps.find((step) => step === params.step);
-  const step: BuildStep = requested ?? buildSteps.find((item) => !done[item]) ?? 'open';
+  // Sin paso pedido, retoma donde quedó la persona la última vez.
+  const step: BuildStep = requested ?? resumeStep(done, onboarding);
+  const draftBlocks = z.array(z.unknown()).catch([]).parse(homePage.data?.draft_blocks);
   const index = buildSteps.indexOf(step);
   const nextStep = buildSteps[index + 1];
   const prevStep = buildSteps[index - 1];
@@ -57,16 +69,27 @@ export default async function BuildPage({ searchParams }: { searchParams: Promis
 
   const mediaKeys = ['choose', 'upload', 'camera', 'alt', 'suggestion', 'invalid', 'failed', 'selected', 'empty'] as const;
   const mediaLabels = Object.fromEntries(mediaKeys.map((key) => [key, t(`media.${key}`)])) as Record<(typeof mediaKeys)[number], string>;
-  const assets = step === 'cover' || step === 'products'
+  const assets = step === 'logo' || step === 'cover' || step === 'products'
     ? (await client.from('media_assets').select('id,path,alt_text,size_bytes').eq('store_id', storeId).eq('kind', 'image')
       .order('created_at', { ascending: false }).limit(60)).data ?? [] : [];
 
   let content: React.ReactNode = null;
-  if (step === 'cover') {
-    const blocks = z.array(z.unknown()).catch([]).parse(homePage.data?.draft_blocks);
+  if (step === 'logo') {
+    content = <LogoStep storeId={storeId} current={selected.logo_asset_id} assets={assets} mediaLabels={mediaLabels} nextHref={href(nextStep ?? 'open')}
+      labels={{ sizeTitle: t('build.logo.sizeTitle'), size: t('build.logo.size'), tips: [t('build.logo.tip1'), t('build.logo.tip2'), t('build.logo.tip3')],
+        upload: t('build.logo.upload'), saved: t('build.logo.saved'), error: t('build.cover.error'), next: t('build.logo.next'), skip: t('build.logo.skip') }} />;
+  } else if (step === 'header') {
+    const names = Object.fromEntries(['calido', 'fresco', 'natural', 'elegante', 'vibrante', 'moderna', 'clasica', 'amigable', 'robusta', 'izquierda', 'centrado']
+      .map((key) => [key, t(`themeOptions.${key}`)]));
+    content = <HeaderStep storeId={storeId} initial={headerChoice(storeRow.data.theme_draft)} initialTheme={storeRow.data.theme_draft} nextHref={href(nextStep ?? 'open')}
+      labels={{ colors: t('build.header.colors'), layout: t('build.header.layout'), style: t('build.header.style'), fonts: t('build.header.fonts'),
+        save: t('build.header.save'), error: t('build.cover.error'), names,
+        styles: { claro: t('build.header.light'), color: t('build.header.color') } }} />;
+  } else if (step === 'cover') {
+    const blocks = draftBlocks;
     const hero = blocks.map((block) => heroBlock.safeParse(block)).find((result) => result.success)?.data;
     const variant = hero?.variant === 'background' || hero?.variant === 'minimal' ? hero.variant : 'split';
-    content = <CoverStep storeId={storeId} assets={assets} mediaLabels={mediaLabels} onSavedHref={href(nextStep ?? 'open')}
+    content = <CoverStep storeId={storeId} blocks={draftBlocks} assets={assets} mediaLabels={mediaLabels} onSavedHref={href(nextStep ?? 'open')}
       initial={{ title: hero?.props.title ?? selected.name, subtitle: hero?.props.subtitle ?? '', variant, assetId: hero?.props.image?.assetId ?? null }}
       labels={{ title: t('build.cover.title'), subtitle: t('build.cover.subtitle'), design: t('build.cover.design'), photo: t('build.cover.photo'),
         save: t('build.cover.save'), saved: t('build.cover.saved'), error: t('build.cover.error'),
@@ -81,6 +104,10 @@ export default async function BuildPage({ searchParams }: { searchParams: Promis
         {params.saved ? `${t('products.saved')} ` : ''}{t('build.steps.products.count', { count: productCount.count ?? 0 })}</p>
       <ProductForm storeId={storeId} categories={categories} labels={labels} afterSaveHref={`${href('products')}&saved=1`}
         media={<MediaPicker storeId={storeId} folder="products" initial={assets} labels={mediaLabels} />} />
+      {(productCount.count ?? 0) > 0 && <ProductsLayout storeId={storeId} blocks={draftBlocks} initial={productsVariant(draftBlocks)}
+        labels={{ title: t('build.productsLayout.title'), help: t('build.productsLayout.help'), save: t('build.productsLayout.save'),
+          saved: t('build.productsLayout.saved'), error: t('build.cover.error'),
+          variants: { grid: t('build.productsLayout.grid'), carousel: t('build.productsLayout.carousel'), 'featured-list': t('build.productsLayout.list') } }} />}
     </div>;
   } else if (step === 'payments') {
     const [shipping, payments, mercadoPago] = await Promise.all([
@@ -115,6 +142,10 @@ export default async function BuildPage({ searchParams }: { searchParams: Promis
           <strong className="text-2xl text-[#7ee2b3]">🎉 {t('build.steps.open.celebrate')}</strong>
           <p className="m-0 text-[#c9cdd8]">{t('build.steps.open.celebrateHelp')}</p>
           <input readOnly value={storeUrl} aria-label={t('build.steps.open.visit')} className="auth-input mt-0" />
+          <form action={publishStore} className="w-full">
+            <input type="hidden" name="storeId" value={storeId} /><input type="hidden" name="from" value="build" />
+            <button type="submit" className="auth-secondary w-full">{t('build.steps.open.update')}</button>
+          </form>
           <div className="flex flex-wrap gap-3">
             <a className="auth-primary" href={storeUrl} target="_blank" rel="noreferrer">{t('build.steps.open.visit')}</a>
             <a className="auth-secondary" target="_blank" rel="noreferrer"
@@ -143,13 +174,14 @@ export default async function BuildPage({ searchParams }: { searchParams: Promis
         <span className="text-sm text-[#a3a9b8]">{selected.name} · {t('build.progress', { step: index + 1, total: buildSteps.length })}</span>
       </div>
       <nav aria-label={t('build.progress', { step: index + 1, total: buildSteps.length })}>
-        <ol className="m-0 grid list-none grid-cols-5 gap-2 p-0">{buildSteps.map((item, at) => <li key={item}>
+        <ol className="m-0 grid list-none grid-cols-7 gap-1.5 p-0">{buildSteps.map((item, at) => <li key={item}>
           <Link href={href(item)} aria-current={item === step ? 'step' : undefined} className="flex flex-col gap-2 text-[13px] text-[#a3a9b8] no-underline aria-[current=step]:font-bold aria-[current=step]:text-[#e9ebf2]">
             <span aria-hidden="true" className={`h-1.5 rounded ${done[item] ? 'bg-[#3fb37f]' : at <= index ? 'bg-[#7c80f2]' : 'bg-[#262a36]'}`} />
             <span className="hidden sm:inline">{done[item] ? '✓ ' : ''}{t(`build.steps.${item}.title`)}</span>
             <span className="sr-only sm:hidden">{t(`build.steps.${item}.title`)}{done[item] ? ` · ${t('build.done')}` : ''}</span>
           </Link></li>)}</ol>
       </nav>
+      <RememberStep storeId={storeId} step={step} />
       <div className="flex flex-wrap items-start gap-8">
         <main className="flex min-w-0 flex-[1_1_440px] flex-col gap-5">
           <h1 className="m-0 text-[clamp(1.75rem,4vw,2.125rem)] leading-tight">{t(`build.steps.${step}.title`)}</h1>

@@ -47,7 +47,7 @@ test('six critical journeys work on mobile and desktop', async ({ page }, info) 
     for (let step = 0; step < 3; step++) await page.getByRole('button', { name: 'Siguiente' }).click();
     await page.getByRole('button', { name: 'Crear mi tienda' }).click();
     // Al crear la tienda se entra directo al armado guiado (T-038).
-    await expect(page.getByRole('heading', { name: 'Tu portada' })).toBeVisible({ timeout: 20_000 }).catch(async (cause: unknown) => {
+    await expect(page.getByRole('heading', { name: 'Tu logo' })).toBeVisible({ timeout: 20_000 }).catch(async (cause: unknown) => {
       const headings = await page.getByRole('heading').allInnerTexts().catch(() => []);
       const alerts = await page.getByRole('alert').allInnerTexts().catch(() => []);
       throw new Error(`Armado guiado no visible en ${page.url()} · títulos: ${headings.join(' | ')} · avisos: ${alerts.join(' | ')}`, { cause });
