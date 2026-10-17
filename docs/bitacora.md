@@ -37,7 +37,7 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 
 | Pieza | Estado |
 |---|---|
-| Repo | github.com/arlenisarmas/plataforma-tiendas (público, pasar a privado) |
+| Repo | github.com/arlenisarmas/plataforma-tiendas (público por ahora para no gastar minutos de CI; pasar a privado antes del lanzamiento) |
 | CI | Escenarios SQL, apps (lint/tipos/tests/build), Supabase real (regenera tipos solo), e2e de 6 flujos (móvil y escritorio), staging, capturas automáticas |
 | Supabase staging | Proyecto gratis en ca-central-1; migraciones automáticas al integrar en `main` vía pooler |
 | Supabase producción | Más adelante, São Paulo (sa-east-1) |
@@ -62,10 +62,7 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 
 ## 6. Pendientes de Arle (cuando quiera)
 
-- En Vercel, proyecto de la tienda (`tiendas-storefront`): agregar `NEXT_PUBLIC_ADMIN_URL=https://panel-tiendas-arle.vercel.app` (vista previa del armado guiado).
-- En Supabase → Authentication → Sign In / Providers: apagar «Allow new users to sign up» (el ingreso es solo por invitación).
-- Copiar `PREVIEW_SECRET` y `REVALIDATE_SECRET` del panel a la tienda en Vercel (tienen que ser iguales).
-- Hacer privado el repo y proteger `main`.
+- Antes del lanzamiento: hacer privado el repo (consume minutos de GitHub Actions) y proteger `main`.
 - Más adelante: credenciales de prueba de Mercado Pago, cuenta de Resend, dominio.
 
 ## 7. Para la auditoría de arquitectura
