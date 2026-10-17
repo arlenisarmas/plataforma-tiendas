@@ -1,0 +1,31 @@
+# Dependencias y builds
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+build/
+!apps/*/app/build/
+.turbo/
+coverage/
+playwright-report/
+test-results/
+
+# Entorno y secretos (nunca se suben)
+.env
+.env.*
+!.env.example
+*.pem
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+*.tsbuildinfo

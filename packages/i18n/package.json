@@ -1,0 +1,22 @@
+{
+  "name": "@plataforma/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./request": "./src/request.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config ../config/vitest.mjs",
+    "lint": "eslint .",
+    "build": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@plataforma/config": "workspace:*"
+  },
+  "dependencies": {
+    "next-intl": "4.13.0"
+  }
+}

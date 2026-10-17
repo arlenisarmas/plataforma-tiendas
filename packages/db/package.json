@@ -1,0 +1,26 @@
+{
+  "name": "@plataforma/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config ../config/vitest.mjs",
+    "lint": "eslint .",
+    "build": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@plataforma/config": "workspace:*",
+    "vitest": "5.0.5"
+  },
+  "dependencies": {
+    "@plataforma/core": "workspace:*",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.3",
+    "server-only": "0.0.1"
+  }
+}

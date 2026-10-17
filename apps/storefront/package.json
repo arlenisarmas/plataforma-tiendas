@@ -1,0 +1,39 @@
+{
+  "name": "@plataforma/storefront",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "start": "next start --port 3000",
+    "dev": "next dev --port 3000",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --config ../../packages/config/vitest.mjs",
+    "lint": "eslint .",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@plataforma/blocks": "workspace:*",
+    "@plataforma/core": "workspace:*",
+    "@plataforma/db": "workspace:*",
+    "@plataforma/emails": "workspace:*",
+    "@plataforma/i18n": "workspace:*",
+    "@plataforma/payments": "workspace:*",
+    "@sentry/nextjs": "^11.7.0",
+    "next": "16.4.1",
+    "next-intl": "4.13.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@plataforma/config": "workspace:*",
+    "@playwright/test": "^1.56.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tailwindcss": "4.3.3"
+  }
+}

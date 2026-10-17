@@ -1,0 +1,62 @@
+name: Base de datos staging
+
+# Aplica las migraciones al proyecto Supabase de staging al integrar en main.
+# Si los secretos todavía no están cargados, se saltea con un aviso (no falla).
+# Secretos necesarios (los carga Arle en GitHub → Settings → Secrets and variables → Actions):
+#   SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD (SUPABASE_ACCESS_TOKEN no es necesario para migrar)
+
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/migrations/**']
+  workflow_dispatch:
+
+concurrency:
+  group: db-staging
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Migrar staging
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      # Región del proyecto de staging (no es secreta). Producción irá en sa-east-1 (São Paulo).
+      SUPABASE_REGION: ${{ vars.SUPABASE_REGION || 'ca-central-1' }}
+    steps:
+      - name: Verificar secretos
+        id: secretos
+        run: |
+          if [ -z "$SUPABASE_PROJECT_REF" ] || [ -z "$SUPABASE_DB_PASSWORD" ]; then
+            echo "::warning::Staging todavía no está configurado (faltan secretos). Se saltea la migración."
+            echo "listo=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "listo=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.secretos.outputs.listo == 'true'
+      - uses: supabase/setup-cli@v1
+        if: steps.secretos.outputs.listo == 'true'
+        with:
+          version: 2.121.0
+      - name: Aplicar migraciones
+        if: steps.secretos.outputs.listo == 'true'
+        run: |
+          # Conexión directa por el pooler de Supabase (modo sesión, IPv4), sin `supabase link`.
+          # La contraseña se codifica para URL; los secretos se enmascaran solos en los logs.
+          set -o pipefail
+          PASS=$(python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"],safe=""))')
+          echo "::add-mask::$PASS"
+          for HOST in aws-0-${SUPABASE_REGION}.pooler.supabase.com aws-1-${SUPABASE_REGION}.pooler.supabase.com; do
+            URL="postgresql://postgres.${SUPABASE_PROJECT_REF}:${PASS}@${HOST}:5432/postgres"
+            echo "::add-mask::$URL"
+            if supabase db push --db-url "$URL" --include-all 2>&1 | tee salida.txt; then
+              echo "::notice title=Staging::Migraciones aplicadas (${HOST})"
+              exit 0
+            fi
+            echo "No se pudo con ${HOST}, probando el siguiente…"
+          done
+          echo "::error title=supabase db push::$(tail -15 salida.txt | tr '\n' ' ' | cut -c1-900)"
+          exit 1

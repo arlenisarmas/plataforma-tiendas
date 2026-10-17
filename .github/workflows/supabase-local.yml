@@ -1,0 +1,74 @@
+name: Supabase local (migraciones, seed y tipos)
+
+# Levanta Supabase con Docker en GitHub (no hace falta Docker en la PC de desarrollo),
+# aplica migraciones + seed reales y verifica que los tipos commiteados estén al día.
+# Si los tipos cambiaron en un PR, el workflow los guarda solo en la rama del PR.
+# En main, si no coinciden, falla (los tipos siempre deben llegar a main dentro del PR).
+
+on:
+  pull_request:
+    paths: ['supabase/**', 'packages/db/src/database.types.ts', '.github/workflows/supabase-local.yml']
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'packages/db/src/database.types.ts']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: supabase-local-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  supabase:
+    name: Supabase real (migraciones, seed y tipos)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # En PRs del mismo repo trabajamos sobre la rama del PR para poder guardar los tipos.
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+      - name: Levantar base de datos local
+        run: supabase db start
+      - name: Aplicar migraciones y seed desde cero
+        run: supabase db reset --local
+      - name: Verificar datos de ejemplo
+        run: |
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -Atc \
+            "select slug || ' ' || status from public.stores order by slug" | tee tiendas.txt
+          grep -q "chepeludos published" tiendas.txt
+          grep -q "carpinteria-del-sur draft" tiendas.txt
+      - name: Generar tipos de TypeScript
+        run: supabase gen types typescript --local --schema public,storefront > database.types.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: database-types
+          path: database.types.ts
+      - name: Comparar con los tipos commiteados (y actualizarlos en PRs)
+        env:
+          MISMO_REPO: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          if diff -q packages/db/src/database.types.ts database.types.ts > /dev/null 2>&1; then
+            echo "Tipos al día ✅"; exit 0
+          fi
+          PUEDE_GUARDAR=false
+          if [ "${{ github.event_name }}" = "pull_request" ] && [ "$MISMO_REPO" = "true" ]; then PUEDE_GUARDAR=true; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.ref_name }}" != "main" ]; then PUEDE_GUARDAR=true; fi
+          if [ "$PUEDE_GUARDAR" = "true" ]; then
+            mkdir -p packages/db/src
+            cp database.types.ts packages/db/src/database.types.ts
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add packages/db/src/database.types.ts
+            git commit -m "Tipos de base de datos generados por Supabase local"
+            git push
+            echo "::notice::Los tipos cambiaron y se guardaron en la rama."
+            exit 0
+          fi
+          echo "::error::Los tipos de la base cambiaron en main sin actualizar packages/db/src/database.types.ts. Corré este workflow sobre una rama o 'pnpm db:types'."
+          diff -u packages/db/src/database.types.ts database.types.ts | head -60
+          exit 1

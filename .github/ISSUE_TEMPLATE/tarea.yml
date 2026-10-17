@@ -1,0 +1,37 @@
+name: Tarea de desarrollo
+description: Tarea especificada por el arquitecto para un agente de desarrollo
+title: "T-XXX: "
+labels: ["estado:bloqueada"]
+body:
+  - type: input
+    id: metadatos
+    attributes:
+      label: Metadatos
+      description: "Área · Ola · Depende de · Necesita a Arle"
+      placeholder: "admin · Ola 2 · T-007, T-013 · no"
+    validations:
+      required: true
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+    validations:
+      required: true
+  - type: textarea
+    id: alcance
+    attributes:
+      label: Alcance
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Criterios de aceptación
+      value: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentos de referencia
+      value: "Leer AGENTS.md antes de empezar."

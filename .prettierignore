@@ -1,0 +1,11 @@
+pnpm-lock.yaml
+.next
+node_modules
+.turbo
+coverage
+supabase
+docs
+tareas
+AGENTS.md
+.github/pull_request_template.md
+packages/db/src/database.types.ts

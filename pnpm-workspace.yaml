@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  unrs-resolver: true
+  esbuild: true
+  sharp: true
+  '@parcel/watcher': false
+  '@swc/core': false
+minimumReleaseAgeExclude:
+  - '@vitest/mocker@5.0.5'
+  - '@vitest/spy@5.0.5'
+  - vitest@5.0.5

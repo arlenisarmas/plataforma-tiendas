@@ -1,0 +1,137 @@
+name: Capturas de pantalla
+
+# Levanta la plataforma completa en GitHub (Supabase local + seed + storefront + panel),
+# saca capturas de las pantallas principales y las guarda en la rama `capturas`.
+# Se corre a mano (Actions → Capturas de pantalla → Run workflow) o al integrar en main.
+# No necesita secretos ni cuentas.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['apps/**', 'packages/**', 'supabase/**']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: capturas
+  cancel-in-progress: true
+
+jobs:
+  capturas:
+    name: Capturas
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+      - name: Levantar Supabase con datos de ejemplo
+        run: |
+          supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor
+          supabase db reset --local
+          supabase status -o env > supa.env
+          echo "NEXT_PUBLIC_SUPABASE_URL=$(grep '^API_URL=' supa.env | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$(grep '^ANON_KEY=' supa.env | cut -d= -f2- | tr -d '"')" >> "$GITHUB_ENV"
+      - name: Instalar y compilar
+        env:
+          NEXT_PUBLIC_STOREFRONT_URL: http://localhost:3000
+          NEXT_PUBLIC_ADMIN_URL: http://127.0.0.1:3001
+          PREVIEW_SECRET: capturas-solo-ci-0123456789abcdef0123456789abcdef
+          REVALIDATE_SECRET: capturas-solo-ci-0123456789abcdef
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Iniciar las apps
+        env:
+          NEXT_PUBLIC_STOREFRONT_URL: http://localhost:3000
+          NEXT_PUBLIC_ADMIN_URL: http://127.0.0.1:3001
+          PREVIEW_SECRET: capturas-solo-ci-0123456789abcdef0123456789abcdef
+          REVALIDATE_SECRET: capturas-solo-ci-0123456789abcdef
+        run: |
+          (cd apps/storefront && nohup pnpm start > ../../storefront.log 2>&1 &)
+          (cd apps/admin && nohup pnpm start > ../../admin.log 2>&1 &)
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://127.0.0.1:3000 -H 'Host: chepeludos.localhost:3000' && \
+            curl -sf -o /dev/null http://127.0.0.1:3001/login && break
+            sleep 2
+          done
+      - name: Sacar capturas
+        working-directory: apps/storefront
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          cat > capturas.mjs <<'EOF'
+          import { chromium, devices } from '@playwright/test';
+          import { mkdirSync } from 'node:fs';
+          const out = '../../capturas';
+          mkdirSync(out, { recursive: true });
+          const browser = await chromium.launch();
+          const tomar = async (page, nombre) => {
+            try { await page.waitForLoadState('networkidle', { timeout: 15000 }); } catch {}
+            await page.screenshot({ path: `${out}/${nombre}.png`, fullPage: true });
+            console.log('✔', nombre, page.url());
+          };
+          const intentar = async (nombre, fn) => { try { await fn(); } catch (e) { console.log('✘', nombre, e.message); } };
+          const tienda = 'http://chepeludos.localhost:3000';
+          for (const [modo, opts] of [['celular', { ...devices['Pixel 5'], viewport: { width: 390, height: 844 } }],
+                                       ['compu', { viewport: { width: 1366, height: 900 } }]]) {
+            const ctx = await browser.newContext({ ...opts, locale: 'es-AR' });
+            const page = await ctx.newPage();
+            await intentar(`tienda-inicio-${modo}`, async () => { await page.goto(tienda); await tomar(page, `tienda-inicio-${modo}`); });
+            await intentar(`tienda-producto-${modo}`, async () => {
+              const href = await page.locator('a[href*="product"], a[href*="producto"]').first().getAttribute('href');
+              await page.goto(new URL(href, tienda).toString()); await tomar(page, `tienda-producto-${modo}`);
+            });
+            await intentar(`tienda-categoria-${modo}`, async () => {
+              await page.goto(tienda);
+              const href = await page.locator('a[href*="categor"], a[href*="coleccion"]').first().getAttribute('href');
+              await page.goto(new URL(href, tienda).toString()); await tomar(page, `tienda-categoria-${modo}`);
+            });
+            await ctx.close();
+          }
+          const ctx = await browser.newContext({ viewport: { width: 1366, height: 900 }, locale: 'es-AR', baseURL: 'http://127.0.0.1:3001' });
+          const page = await ctx.newPage();
+          await intentar('panel-login', async () => { await page.goto('/login'); await tomar(page, 'panel-login'); });
+          await intentar('panel-ingreso', async () => {
+            await page.getByLabel('Correo electrónico').first().fill('arle@ejemplo.com');
+            await page.getByLabel('Contraseña').fill('demo1234');
+            await page.getByRole('button', { name: 'Ingresar' }).click();
+            await page.waitForURL('http://127.0.0.1:3001/', { timeout: 20000 });
+            await tomar(page, 'panel-inicio');
+          });
+          for (const [nombre, ruta] of [['panel-productos', '/products'], ['panel-paginas', '/page/pages'],
+                                        ['panel-imagenes', '/page/media'], ['panel-ajustes', '/settings'],
+                                        ['panel-nueva-tienda', '/stores/new']]) {
+            await intentar(nombre, async () => { await page.goto(ruta); await tomar(page, nombre); });
+          }
+          await intentar('panel-editor', async () => {
+            await page.goto('/page/pages');
+            const href = await page.locator('a[href*="/page/edit"]').first().getAttribute('href');
+            await page.goto(href); await tomar(page, 'panel-editor');
+          });
+          await browser.close();
+          EOF
+          node capturas.mjs
+      - name: Guardar capturas en la rama "capturas"
+        run: |
+          ls capturas
+          mkdir /tmp/c && cp capturas/*.png /tmp/c/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan capturas-tmp
+          git rm -rq --cached . && git clean -fdq -e node_modules
+          cp /tmp/c/*.png .
+          printf '# Capturas\n\nGeneradas automáticamente desde %s.\n' "$GITHUB_SHA" > README.md
+          git add *.png README.md
+          git commit -qm "Capturas de $GITHUB_SHA"
+          git push -f origin HEAD:capturas
+      - name: Logs si algo falló
+        if: failure()
+        run: tail -50 storefront.log admin.log || true

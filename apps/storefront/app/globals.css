@@ -1,0 +1,3 @@
+@import 'tailwindcss';
+@import '@plataforma/blocks/styles.css';
+@config "../../../packages/config/tailwind.mjs";
