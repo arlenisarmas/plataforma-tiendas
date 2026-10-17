@@ -13,6 +13,7 @@ import { ProductForm } from '../products/new/product-form';
 import { publishStore } from '../publish/actions';
 import { SettingsForms } from '../settings/settings-forms';
 import { StoreDetails } from '../settings/store-details';
+import { BuildPreview } from './build-preview';
 import { CoverStep } from './cover-step';
 
 const heroBlock = z.object({ type: z.literal('hero'), variant: z.string().optional(),
@@ -28,7 +29,7 @@ export default async function BuildPage({ searchParams }: { searchParams: Promis
   const { client, selected } = data;
   const storeId = selected.id;
   const [storeRow, homePage, productCount] = await Promise.all([
-    client.from('stores').select('slug,currency,default_locale,contact').eq('id', storeId).single(),
+    client.from('stores').select('slug,currency,default_locale,contact,theme_draft').eq('id', storeId).single(),
     client.from('pages').select('id,draft_blocks').eq('store_id', storeId).eq('kind', 'home').single(),
     client.from('products').select('id', { count: 'exact', head: true }).eq('store_id', storeId).eq('status', 'active'),
   ]);
@@ -164,12 +165,11 @@ export default async function BuildPage({ searchParams }: { searchParams: Promis
             <Link href={`/?store=${storeId}`} className="min-h-11 content-center text-sm">{t('build.advanced')}</Link>
           </div>
         </main>
-        <aside aria-label={t('build.preview')} className="flex min-w-0 flex-[1_1_380px] flex-col gap-3 lg:sticky lg:top-6">
-          <span className="text-sm font-semibold text-[#a3a9b8]">{t('build.preview')}</span>
-          {previewToken
-            ? <iframe title={t('build.preview')} src={`${previewBase}/preview/${previewToken}`} className="h-[640px] w-full rounded-2xl border border-[#232733] bg-white" />
-            : <div className="flex h-[320px] items-center justify-center rounded-2xl border border-dashed border-[#3a3f55] p-6 text-center text-[#a3a9b8]">{t('editor.previewUnavailable')}</div>}
-          <span className="text-[13px] text-[#a3a9b8]">{t('build.previewHelp')}</span>
+        <aside className="min-w-0 flex-[1_1_420px] lg:sticky lg:top-6">
+          <BuildPreview src={previewToken ? `${previewBase}/preview/${previewToken}` : null} origin={new URL(previewBase).origin}
+            token={previewToken ?? ''} initialBlocks={homePage.data?.draft_blocks ?? []} initialTheme={storeRow.data.theme_draft}
+            labels={{ title: t('build.preview'), help: t('build.previewHelp'), desktop: t('build.desktop'), mobile: t('build.mobile'),
+              unavailable: t('editor.previewUnavailable') }} />
         </aside>
       </div>
     </div>

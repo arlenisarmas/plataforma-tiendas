@@ -14,6 +14,7 @@ export function readPreviewToken(token: string, secret: string | undefined, now 
     const decipher = createDecipheriv('aes-256-gcm', createHash('sha256').update(secret).digest(), iv);
     decipher.setAuthTag(tag);
     const payload = payloadSchema.parse(JSON.parse(Buffer.concat([decipher.update(encrypted), decipher.final()]).toString()));
-    return payload.expiresAt > now && payload.expiresAt <= now + 15 * 60_000 ? payload : null;
+    // Tolera un minuto de diferencia de reloj entre el panel y la tienda.
+    return payload.expiresAt > now && payload.expiresAt <= now + 16 * 60_000 ? payload : null;
   } catch { return null; }
 }

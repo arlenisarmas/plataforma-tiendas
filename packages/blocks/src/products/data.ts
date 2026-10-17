@@ -35,7 +35,7 @@ async function previewRows(view: string, ctx: StoreContext, accessToken: string,
   if (!pending) {
     pending = fetch(new URL('rest/v1/rpc/preview_storefront_rows', `${base.replace(/\/$/, '')}/`), {
       method: 'POST', cache: 'no-store',
-      headers: { apikey: key, Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      headers: { apikey: key, Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Content-Profile': 'public' },
       body: JSON.stringify({ p_store_id: ctx.storeId, p_view: view }),
     }).then(async (response) => {
       if (!response.ok) throw new Error(`Preview view ${view} unavailable`);
