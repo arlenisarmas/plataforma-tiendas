@@ -14,7 +14,7 @@ async function privateRows<T extends z.ZodType>(view: string, schema: T, filters
   const url = new URL(`rest/v1/${view}`, `${base.replace(/\/$/, '')}/`);
   url.searchParams.set('select', '*');
   for (const [field, value] of Object.entries(filters)) url.searchParams.set(field, value);
-  const response = await fetch(url, { cache: 'no-store', headers: { apikey: key, Authorization: `Bearer ${jwt}` } });
+  const response = await fetch(url, { cache: 'no-store', headers: { apikey: key, Authorization: `Bearer ${jwt}`, 'Accept-Profile': 'public' } });
   if (!response.ok) throw new Error('Preview data unavailable');
   return z.array(schema).parse(await response.json());
 }
