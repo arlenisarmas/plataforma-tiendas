@@ -50,13 +50,16 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 | 1–3 | T-001 a T-020, T-026 (base, bloques, editor, productos, stock, tienda pública, asistente de alta) | ✅ Integrados |
 | 4 | T-021 Carrito, T-022 Pagos, T-023 Compra, T-024 Pedidos, T-025 Emails, T-027 Clientes y equipo, T-028 Publicar y ajustes, T-030 Seguridad y rendimiento, T-031 e2e | ✅ Integrado (PR #41). Sin credenciales reales: Mercado Pago y emails con dobles de prueba. Claude terminó T-025 (integración) y T-031 (e2e en verde) cuando Codex se quedó sin tokens |
 | 5 | T-033 Permisos e invitaciones de plataforma, T-037 Estilo de consola oscura, T-032 Mi espacio, T-034 Consola de plataforma, T-035 Acceso solo por invitación, T-036 Actividad y horarios, T-038 Armado guiado | ✅ Integrado (PR #49). Hecho por Claude (Codex sin tokens) |
+| 6 | T-039 Vista previa con productos sin publicar, T-040 Logo y barra de arriba, T-041 Vista previa computadora/celular en vivo, T-042 Armado guiado completo, T-043 Retomar donde quedó | ✅ Integrado (PR #55). Hecho por Claude |
 | — | T-029 Dominios propios | ⏸ Necesita dominio y Vercel (Arle) |
 
 ### Cómo funciona desde el Lote 5
 
 - **Ingreso:** solo por invitación (no hay registro abierto). La administradora entra y cae en la **Consola** (`/platform`): indicadores, quién está trabajando ahora, actividad, tiendas, personas y permisos, horarios (semana/mes, descarga CSV) e invitaciones.
 - **Invitar:** Consola → Invitar persona. Se elige si puede crear sus propias tiendas y cuántas (cupo), o se le crea una tienda ya armada. Llega un link `/join/<código>` donde la persona elige su contraseña.
-- **Personas invitadas:** caen en **Mi espacio**: solo sus proyectos, su cupo y el botón «Nuevo proyecto» con el asistente guiado y vista previa en vivo; después siguen el **armado guiado** (`/build`): portada, productos, pagos y envíos, contacto, abrir la tienda.
+- **Personas invitadas:** caen en **Mi espacio**: solo sus proyectos, su cupo y el botón «Nuevo proyecto» con el asistente guiado y vista previa en vivo; después siguen el **armado guiado** (`/build`).
+- **Armado guiado (Lote 6):** logo (tamaño recomendado 512×512 o 600×200, consejos) → barra de arriba (colores, posición del logo, fondo, letra) → portada → productos (y cómo se muestran) → pagos y envíos → contacto → abrir. Vista previa al costado con 💻/📱 que cambia en vivo. Se guarda el último paso en `stores.onboarding` y «Seguir armando» retoma ahí.
+- La vista previa necesita `PREVIEW_SECRET` igual en panel y tienda, y `NEXT_PUBLIC_ADMIN_URL` en la tienda (cargados por Arle el 16/10).
 - **Pausar:** se puede pausar una persona (pierde acceso) o una tienda.
 - En staging, la cuenta de ejemplo `arle@ejemplo.com` es la administradora (workflow «Datos de ejemplo en staging»).
 
