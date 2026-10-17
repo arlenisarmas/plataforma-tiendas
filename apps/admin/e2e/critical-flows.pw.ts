@@ -5,7 +5,8 @@ import { expect, test, type Page, type TestInfo } from '@playwright/test';
 const photo = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
 
 // Next.js renders an empty role="alert" route announcer; only alerts with text are errors.
-const errorAlert = (page: Page) => page.getByRole('alert').filter({ hasText: /\S/ });
+// Avisos visibles con texto; se excluye el anunciador de rutas de Next (lee el título de la página nueva).
+const errorAlert = (page: Page) => page.locator('[role="alert"]:not(#__next-route-announcer__)').filter({ hasText: /\S/ });
 
 async function audit(page: Page) {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
@@ -186,7 +187,7 @@ test('the admin invites a person who sets a password and lands in My space', asy
 
   await test.step('Una persona sin permiso no ve la consola y el registro abierto está cerrado', async () => {
     await page.goto('/platform');
-    await expect(page.getByRole('alert').filter({ hasText: /\S/ })).toContainText('No tienes permiso');
+    await expect(errorAlert(page)).toContainText('No tienes permiso');
     await page.context().clearCookies();
     await page.goto('/signup');
     await expect(page.getByRole('status')).toContainText('solo por invitación');
