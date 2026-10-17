@@ -810,6 +810,9 @@ isOneToOne: false
               "email": string,"full_name": string,"minutes": number,"sessions": number,"store_id": string,"store_name": string,"user_id": string
             }[]
                            },
+"preview_storefront_rows":
+{ Args: { "p_store_id": string,"p_view": string }; Returns: Json
+                           },
 "publish_page":
 { Args: { "p_note"?: string,"p_page_id": string }; Returns: string
                            },
