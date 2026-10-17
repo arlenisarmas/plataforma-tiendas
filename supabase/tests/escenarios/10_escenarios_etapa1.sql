@@ -305,5 +305,19 @@ select t.eq('tienda suspendida', (select status::text from public.stores where i
 select public.set_store_suspended(t.v('ST_AMIGO2'), false);
 select t.eq('tienda reactivada como borrador', (select status::text from public.stores where id = t.v('ST_AMIGO2')), 'draft');
 
+-- 16. Vista previa del catálogo para tiendas sin publicar (T-039) -------------
+select t.as_user('aaaaaaaa-0000-0000-0000-000000000001');
+select t.eq('la dueña ve sus productos en la vista previa',
+  jsonb_array_length(public.preview_storefront_rows(t.v('SA'), 'products')) >= 1, true);
+select t.eq('la vista previa trae el tema en borrador',
+  (public.preview_storefront_rows(t.v('SA'), 'stores') -> 0) ? 'theme', true);
+select t.eq('la vista previa trae precios', jsonb_array_length(public.preview_storefront_rows(t.v('SA'), 'variants')) >= 1, true);
+select t.expect_error('vista desconocida', format('select public.preview_storefront_rows(%L, %L)', t.v('SA'), 'orders'), 'VISTA_INVALIDA');
+select t.as_user('cccccccc-0000-0000-0000-000000000003');
+select t.expect_error('otra persona no ve la vista previa ajena', format('select public.preview_storefront_rows(%L, %L)', t.v('SA'), 'products'), 'SIN_PERMISO');
+set role anon;
+select t.expect_error('sin sesión no hay vista previa', format('select public.preview_storefront_rows(%L, %L)', t.v('SA'), 'products'), 'permission denied');
+set role authenticated;
+
 reset role;
 \echo '==== TODAS LAS PRUEBAS PASARON ===='

@@ -14,10 +14,45 @@ type Image = z.infer<typeof image>;
 export type ProductCardData = Product & { variant: Variant | undefined; image: Image | undefined; currency: z.infer<typeof store>['currency'] };
 export type CategoryData = z.infer<typeof category>;
 
+const previewCache = new WeakMap<StoreContext, Map<string, Promise<unknown[]>>>();
+
+/** Filtros simples de PostgREST (`eq.` y `limit`) aplicados en memoria a las filas de la vista previa. */
+export function applyFilters(rows: unknown[], filters: Record<string, string>): unknown[] {
+  let result = rows;
+  for (const [name, value] of Object.entries(filters)) {
+    if (name === 'limit' || !value.startsWith('eq.')) continue;
+    const expected = value.slice(3);
+    result = result.filter((row) => typeof row === 'object' && row !== null && String((row as Record<string, unknown>)[name]) === expected);
+  }
+  const limit = Number(filters.limit);
+  return Number.isInteger(limit) && limit > 0 ? result.slice(0, limit) : result;
+}
+
+async function previewRows(view: string, ctx: StoreContext, accessToken: string, base: string, key: string): Promise<unknown[]> {
+  let cache = previewCache.get(ctx);
+  if (!cache) { cache = new Map(); previewCache.set(ctx, cache); }
+  let pending = cache.get(view);
+  if (!pending) {
+    pending = fetch(new URL('rest/v1/rpc/preview_storefront_rows', `${base.replace(/\/$/, '')}/`), {
+      method: 'POST', cache: 'no-store',
+      headers: { apikey: key, Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_store_id: ctx.storeId, p_view: view }),
+    }).then(async (response) => {
+      if (!response.ok) throw new Error(`Preview view ${view} unavailable`);
+      return z.array(z.unknown()).parse(await response.json());
+    });
+    cache.set(view, pending);
+  }
+  return pending;
+}
+
 export async function readView<T extends z.ZodType>(view: string, schema: T, ctx: StoreContext, filters: Record<string, string> = {}): Promise<z.infer<T>[]> {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!base || !key) throw new Error('Missing public Supabase settings');
+  if (ctx.preview) {
+    return z.array(schema).parse(applyFilters(await previewRows(view, ctx, ctx.preview.accessToken, base, key), filters));
+  }
   const url = new URL(`rest/v1/${view}`, `${base.replace(/\/$/, '')}/`);
   url.searchParams.set('select', '*');
   url.searchParams.set(view === 'stores' ? 'id' : 'store_id', `eq.${ctx.storeId}`);

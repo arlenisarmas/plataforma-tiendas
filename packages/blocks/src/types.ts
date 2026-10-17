@@ -2,7 +2,9 @@ import type { ComponentType } from 'react';
 import type { z } from 'zod';
 import type { Theme } from './theme';
 
-export type StoreContext = { storeId: string; locale: string; assetUrl: (assetId: string) => string | undefined };
+export type StoreContext = { storeId: string; locale: string; assetUrl: (assetId: string) => string | undefined;
+  /** Vista previa de una tienda sin publicar: sesión de quien la administra (lee el borrador vía RPC). */
+  preview?: { accessToken: string } };
 export type BlockVariant = { id: string; i18n: { name: string; description?: string }; thumbnail: string };
 export type FieldSpec = {
   name: string;
