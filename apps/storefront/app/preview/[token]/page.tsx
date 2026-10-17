@@ -8,5 +8,5 @@ export default async function PreviewPage({ params }: { params: Promise<{ token:
   const { token } = await params;
   const draft = await renderDraft(token);
   if (!draft) notFound();
-  return <PreviewFrame token={token} origin={draft.origin} initial={draft.nodes} theme={draft.theme} storeName={draft.storeName} />;
+  return <PreviewFrame token={token} origin={draft.origin} initial={draft.nodes} theme={draft.theme} storeName={draft.storeName} logoUrl={draft.logoUrl} />;
 }

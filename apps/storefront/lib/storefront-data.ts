@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const storeSchema = z.object({ id: z.uuid(), name: z.string(), slug: z.string(), default_locale: z.string(),
-  currency: z.enum(['ARS', 'CLP', 'USD']), theme: z.unknown() });
+  currency: z.enum(['ARS', 'CLP', 'USD']), theme: z.unknown(), logo_asset_id: z.uuid().nullable().optional() });
 export const pageSchema = z.object({ id: z.uuid(), store_id: z.uuid(), slug: z.string().nullable(), kind: z.string(), blocks: z.unknown() });
 export const mediaSchema = z.object({ id: z.uuid(), path: z.string() });
 export const domainSchema = z.object({ hostname: z.string(), store_id: z.uuid() });

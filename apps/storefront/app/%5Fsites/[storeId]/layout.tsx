@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { StoreLayout, createTheme, themeSchema } from '@plataforma/blocks';
-import { readStorefront, storeSchema } from '../../../lib/storefront-data';
+import { mediaSchema, mediaUrl, readStorefront, storeSchema } from '../../../lib/storefront-data';
 import { catalogLabels } from '../../../lib/catalog-ui';
 import { z } from 'zod';
 import { currentCart } from '../../../lib/cart-server';
@@ -33,7 +33,9 @@ export default async function SiteLayout({ children, params }: { children: React
   const navigation = await readStorefront('pages', z.object({ id: z.uuid(), slug: z.string(), title: z.string(),
     show_in_nav: z.boolean(), nav_position: z.number() }), { store_id: `eq.${storeId}`, show_in_nav: 'eq.true',
     order: 'nav_position.asc' }, [`store:${storeId}`]);
-  return <StoreLayout theme={theme.success ? theme.data : createTheme()} storeName={store.name} homeHref={homeHref}>
+  const logo = store.logo_asset_id ? (await readStorefront('media', mediaSchema, { id: `eq.${store.logo_asset_id}`, limit: '1' }, [`store:${storeId}`]))[0] : undefined;
+  return <StoreLayout theme={theme.success ? theme.data : createTheme()} storeName={store.name} homeHref={homeHref}
+    logoUrl={logo ? mediaUrl(logo.path) : undefined}>
     <nav className="mx-auto flex max-w-6xl flex-wrap gap-3 px-4 py-2" aria-label={labels.nav}>
       <Link href={cartHref} className="min-h-11 rounded px-2 py-3 underline">{cartLabels.title} ({cartCount})</Link>
       {navigation.map((page) => <a key={page.id} href={page.slug ? `/${page.slug}` : homeHref}
