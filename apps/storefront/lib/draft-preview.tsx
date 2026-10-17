@@ -3,7 +3,7 @@ import { createTheme, renderPage, themeSchema } from '@plataforma/blocks';
 import { readPreviewToken } from './preview-token';
 import { mediaUrl } from './storefront-data';
 
-const storeSchema = z.object({ id: z.uuid(), name: z.string(), default_locale: z.string(), theme_draft: z.unknown() });
+const storeSchema = z.object({ id: z.uuid(), name: z.string(), default_locale: z.string(), theme_draft: z.unknown(), logo_asset_id: z.uuid().nullable() });
 const pageSchema = z.object({ id: z.uuid(), store_id: z.uuid(), draft_blocks: z.unknown() });
 const mediaSchema = z.object({ id: z.uuid(), path: z.string() });
 
@@ -32,7 +32,8 @@ export async function draftContext(token: string) {
   const assets = new Map(media.map((asset) => [asset.id, mediaUrl(asset.path)]));
   const theme = themeSchema.safeParse(store.theme_draft);
   return { store, page, origin: payload.origin, theme: theme.success ? theme.data : createTheme(),
-    ctx: { storeId: store.id, locale: store.default_locale, assetUrl: (id: string) => assets.get(id) } };
+    logoUrl: store.logo_asset_id ? assets.get(store.logo_asset_id) : undefined,
+    ctx: { storeId: store.id, locale: store.default_locale, assetUrl: (id: string) => assets.get(id), preview: { accessToken: payload.accessToken } } };
 }
 
 export async function renderDraft(token: string, blocks?: unknown, themeInput?: unknown) {
@@ -40,5 +41,5 @@ export async function renderDraft(token: string, blocks?: unknown, themeInput?: 
   if (!draft) return null;
   const theme = themeInput === undefined ? draft.theme : themeSchema.parse(themeInput);
   const nodes = await renderPage(blocks ?? draft.page.draft_blocks, draft.ctx, theme);
-  return { nodes, theme, origin: draft.origin, storeName: draft.store.name };
+  return { nodes, theme, origin: draft.origin, storeName: draft.store.name, logoUrl: draft.logoUrl };
 }

@@ -113,6 +113,7 @@ Errores de negocio con códigos estables (la app los traduce a mensajes amables,
 | `set_store_suspended(store, bool)` | admin plataforma | Suspende o reactiva una tienda |
 | `touch_work_session(store?)` | authenticated | Presencia: extiende la sesión de trabajo (15 min de inactividad abren una nueva) |
 | `platform_overview/stores/people/presence/activity/work_hours` | admin plataforma | Lecturas de la consola |
+| `preview_storefront_rows(store, vista)` | miembro de la tienda | Vista previa: filas de stores/categories/products/product_images/variants aunque la tienda no esté publicada (`VISTA_INVALIDA` si la vista no existe) |
 
 Triggers: perfil automático al registrarse, inventario automático por variante,
 `updated_at`, protección del último dueño, validación de transiciones de pedido.
