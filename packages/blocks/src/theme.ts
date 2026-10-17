@@ -32,7 +32,8 @@ export const themeSchema = z.object({
   fonts: z.enum(['moderna', 'clasica', 'amigable', 'robusta']),
   radius: z.enum(['recto', 'suave', 'redondo']),
   buttonStyle: z.enum(['solido', 'contorno']),
-  header: z.object({ layout: z.enum(['centrado', 'izquierda']), showSearch: z.boolean(), announcementBlockId: z.string().optional() }),
+  header: z.object({ layout: z.enum(['centrado', 'izquierda']), style: z.enum(['claro', 'color']).default('claro'),
+    showSearch: z.boolean(), announcementBlockId: z.string().optional() }),
   footer: z.object({ showSocial: z.boolean(), showPaymentIcons: z.boolean(), text: z.string().optional() }),
 }).superRefine((theme, ctx) => {
   if ((['text', 'primary', 'accent'] as const).some((color) => contrastRatio(theme.colors[color], theme.colors.background) < 4.5))
@@ -43,7 +44,7 @@ export type Theme = z.infer<typeof themeSchema>;
 
 export function createTheme(palette: keyof typeof curatedPalettes = 'fresco'): Theme {
   return { palette, colors: curatedPalettes[palette], fonts: 'moderna', radius: 'suave', buttonStyle: 'solido',
-    header: { layout: 'izquierda', showSearch: false }, footer: { showSocial: false, showPaymentIcons: false } };
+    header: { layout: 'izquierda', style: 'claro', showSearch: false }, footer: { showSocial: false, showPaymentIcons: false } };
 }
 
 export function themeToCssVars(input: unknown): Record<string, string> {

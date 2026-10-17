@@ -23,7 +23,11 @@ export const featuredProductsDefinition = {
     { name: 'limit', kind: 'number', i18n: { label: 'blocks.productLimit' }, simple: false },
   ],
   variants: variants('featuredProducts', ['grid', 'carousel', 'featured-list']), defaultVariant: 'grid',
-  loader: (props, ctx) => productData(ctx, props.limit, { is_featured: 'eq.true' }), Component: ProductCollection,
+  // Si todavía no hay destacados, muestra los últimos productos para que la portada nunca quede vacía.
+  loader: async (props, ctx) => {
+    const featured = await productData(ctx, props.limit, { is_featured: 'eq.true' });
+    return featured.items.length > 0 ? featured : productData(ctx, props.limit);
+  }, Component: ProductCollection,
 } satisfies BlockDefinition<typeof featuredProductsSchema>;
 
 export const categoryGridDefinition = {
