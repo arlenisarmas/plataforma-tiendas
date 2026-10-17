@@ -27,6 +27,7 @@ export function BuildPreview({ src, origin, token, initialBlocks, initialTheme, 
   const box = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
   const latest = useRef<{ blocks: unknown; theme: unknown }>({ blocks: initialBlocks, theme: initialTheme });
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const choose = (value: Device) => setDevice(value);
 
@@ -49,7 +50,9 @@ export function BuildPreview({ src, origin, token, initialBlocks, initialTheme, 
     const onChange = (event: Event) => {
       const detail = (event as CustomEvent<PreviewChange>).detail;
       latest.current = { blocks: detail.blocks ?? latest.current.blocks, theme: detail.theme ?? latest.current.theme };
-      post();
+      // Espera a que la persona termine de escribir antes de redibujar la tienda.
+      clearTimeout(timer.current);
+      timer.current = setTimeout(post, 350);
     };
     const onReload = () => setReloads((value) => value + 1);
     window.addEventListener('build-preview', onChange);
