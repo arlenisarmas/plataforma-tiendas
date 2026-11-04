@@ -54,7 +54,8 @@ aunque estén en la misma ola. Las olas solo agrupan; las dependencias mandan.
 | 6 | T-053 · Cabecera de dos niveles y barra inferior en celular | blocks | T-044 | — |
 | 6 | T-054 · Tarjetas de producto y de categoría con insignias | blocks | T-045 | — |
 | 6 | T-055 · Reseñas y puntuación de productos (datos) | db | T-014, T-024 | — |
-| 6 | T-056 · Plantillas Tecnología y Repuestos | blocks | T-052, T-053, T-054 | — |
+| 6 | T-056 · Plantillas Tecnología, Repuestos y Hogar | blocks | T-052, T-053, T-054 | — |
+| 6 | T-058 · Productos a medida: pedir presupuesto | admin | T-047, T-023 | — |
 | 6 | T-057 · Stripe para Estados Unidos y España | payments | T-022 | ⚠️ sí |
 
 ---
@@ -726,16 +727,30 @@ Corre en CI contra Supabase local.
 
 ---
 
-## T-056 · Plantillas Tecnología y Repuestos
+## T-056 · Plantillas Tecnología, Repuestos y Hogar
 - **Área:** blocks · **Ola:** 6 · **Depende de:** T-052, T-053, T-054 · **Necesita a Arle:** no
 
-**Alcance.** Rubros `tecnologia` y `repuestos` en `templates.ts`: portada con imagen de fondo, categorías con imagen y etiqueta, productos destacados con insignias, banner de promo, franja de confianza (envío, compra segura, devoluciones, garantía) y footer completo. Textos de ejemplo claros y editables. Disponibles en el asistente «Creá tu tienda».
+**Alcance.** Rubros `tecnologia`, `repuestos` y `hogar-muebles` (paleta marrón, arena, crema y verde; categorías «Explorá por ambiente» con foto; claro, sin tema oscuro) en `templates.ts`: portada con imagen de fondo, categorías con imagen y etiqueta, productos destacados con insignias, banner de promo, franja de confianza (envío, compra segura, devoluciones, garantía) y footer completo. Textos de ejemplo claros y editables. Disponibles en el asistente «Creá tu tienda».
 
 **Criterios de aceptación.**
-- [ ] Crear una tienda con cada rubro deja una portada publicable en tema oscuro (test).
+- [ ] Crear una tienda con cada rubro deja una portada publicable (test).
 - [ ] Sin fotos subidas muestra espacios con aviso, no imágenes rotas.
 
 > **Fuera de este lote (decidir con Arle):** selector «Mi vehículo» con compatibilidad de repuestos por marca, modelo y año. Es una función grande (datos de compatibilidad por producto); solo tiene sentido si realmente se venden repuestos.
+
+---
+
+## T-058 · Productos a medida: pedir presupuesto
+- **Área:** admin · **Ola:** 6 · **Depende de:** T-047, T-023 · **Necesita a Arle:** no
+
+**Objetivo.** Para cocinas, closets y muebles a medida (carpintería): productos que no se pagan en el momento sino que se cotizan.
+
+**Alcance.** Producto con modo «A medida»: en vez de «Agregar al carrito» muestra «Pedir presupuesto» con precio «desde» opcional. Formulario corto (nombre, contacto, medidas, comentario y fotos opcionales) y botón de WhatsApp con el producto ya citado. Los pedidos de presupuesto llegan al panel en una lista con estados (nuevo, respondido, aceptado, descartado) y por email al dueño. Al aceptar, el dueño puede convertirlo en pedido con el precio acordado y un link de pago (Mercado Pago o manual).
+
+**Criterios de aceptación.**
+- [ ] Un producto a medida no se puede comprar por carrito ni por URL directa (test).
+- [ ] Las fotos del cliente van a un bucket privado con tipos y tamaño limitados.
+- [ ] Rate limiting y anti-spam en el formulario.
 
 ---
 
