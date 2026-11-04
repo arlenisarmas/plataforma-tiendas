@@ -554,7 +554,7 @@ Corre en CI contra Supabase local.
 - `packages/blocks/src/theme.ts`: sumar las paletas curadas `vasos-tazas` y `che-peludos` (valores de la tabla, corregidos para pasar `WCAG AA`; los textos blancos sobre color principal deben cumplir 4,5:1).
 - Sumar los pares de letras `divertida` (Baloo 2 + Nunito) y `calida` (Poppins + Pacifico para detalles), cargadas con `next/font/google` en el storefront; en el admin la vista previa usa las mismas.
 - `themeToCssVars` expone `--theme-font-display` además de `--theme-font-body`.
-- Actualizar el enum del tema y su migración de datos si `themeSchema` se guarda en la base (tema anterior sigue válido).
+- Ampliar los enums de `themeSchema` (paleta y letras). El tema se guarda en `stores.theme_draft`/`theme_published` (`jsonb`), así que **no hay migración**: los temas guardados siguen válidos tal cual.
 - Textos del selector en `packages/i18n/messages/es-419`.
 
 **Criterios de aceptación.**
