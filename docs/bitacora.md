@@ -66,8 +66,17 @@ Estados Unidos. Personas de 20 a 60+ años, sin conocimientos técnicos.
 
 ## 6. Pendientes de Arle (cuando quiera)
 
-- Antes del lanzamiento: hacer privado el repo (consume minutos de GitHub Actions) y proteger `main`.
-- Más adelante: credenciales de prueba de Mercado Pago, cuenta de Resend, dominio.
+Todo lo que requiere a Arle va **al final**: Claude y Codex avanzan primero con todo lo demás (Lote 7, T-044 a T-051)
+y recién después le piden esto, en este orden:
+
+1. **Mercado Pago (prueba):** crear la app de desarrollador y pasar las credenciales de prueba, cargadas solo como secretos en Vercel/Supabase (nunca en el chat). Habilita probar un pago real en T-022/T-051.
+2. **Resend:** cuenta gratuita y clave como secreto, para los emails de pedido, acceso a cursos y avisos (T-025, T-049).
+3. **Dominio y Vercel:** elegir/comprar el dominio y conectarlo (T-029). Una vez por tienda que tenga dominio propio.
+4. **Stripe (T-052):** cuenta de Stripe y claves de prueba como secretos, solo si se vende a Estados Unidos o España.
+5. **Antes del lanzamiento:** pasar el repo a privado y proteger `main`.
+6. **Che Peludos:** decidir si queda en su código actual o se migra al motor (ver más abajo), y revisar los textos y fotos de las tiendas antes de abrirlas.
+
+Codex no toma tareas con etiqueta `necesita-a-arle` hasta que Arle avise que su parte está lista.
 
 ## 7. Para la auditoría de arquitectura
 
