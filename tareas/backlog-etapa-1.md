@@ -50,7 +50,12 @@ aunque estén en la misma ola. Las olas solo agrupan; las dependencias mandan.
 | 6 | T-049 · Producto digital: entrega tras el pago | storefront | T-047, T-025 | — |
 | 6 | T-050 · Kits de productos | admin | T-047 | — |
 | 6 | T-051 · Pantalla «Pagos» en el panel | admin | T-020, T-022 | — |
-| 6 | T-052 · Stripe para Estados Unidos y España | payments | T-022 | ⚠️ sí |
+| 6 | T-052 · Temas oscuros y portada con imagen de fondo | blocks | T-044 | — |
+| 6 | T-053 · Cabecera de dos niveles y barra inferior en celular | blocks | T-044 | — |
+| 6 | T-054 · Tarjetas de producto y de categoría con insignias | blocks | T-045 | — |
+| 6 | T-055 · Reseñas y puntuación de productos (datos) | db | T-014, T-024 | — |
+| 6 | T-056 · Plantillas Tecnología y Repuestos | blocks | T-052, T-053, T-054 | — |
+| 6 | T-057 · Stripe para Estados Unidos y España | payments | T-022 | ⚠️ sí |
 
 ---
 
@@ -663,7 +668,78 @@ Corre en CI contra Supabase local.
 
 ---
 
-## T-052 · Stripe para Estados Unidos y España
+## T-052 · Temas oscuros y portada con imagen de fondo
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-044 · **Necesita a Arle:** no
+
+**Objetivo.** Que el motor haga tiendas oscuras como las de referencia «TechZone» (azul noche, cian y violeta) y «AutoParts» (negro, rojo y crema).
+
+**Alcance.**
+- Paletas curadas `tecnologia` y `repuestos`, con fondo oscuro, que pasen contraste AA para texto, botones y precios (usar `contrastRatio`). El tema guarda si es claro u oscuro y la tienda lo respeta en todas las páginas, incluido el carrito y la compra.
+- `hero` variante `imagen-fondo`: imagen a todo el ancho, texto a la izquierda, botón principal y hasta 3 íconos de confianza debajo. Capa oscura automática detrás del texto para que siempre se lea; imagen de celular distinta de la de computadora, opcional.
+- `hero` admite varias diapositivas con puntos indicadores (carrusel simple, sin autoplay si «reducir movimiento»).
+
+**Criterios de aceptación.**
+- [ ] El texto del hero cumple AA sobre cualquier imagen subida (test con imagen clara y oscura).
+- [ ] Carrito y compra se ven bien en tema oscuro (capturas e2e).
+- [ ] Temas claros existentes no cambian (test).
+
+---
+
+## T-053 · Cabecera de dos niveles y barra inferior en celular
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-044 · **Necesita a Arle:** no
+
+**Alcance.**
+- Cabecera variante `dos-niveles`: franja superior con avisos y links (envíos, atención al cliente, seguimiento de pedido), barra principal con logo, buscador con botón y carrito, y barra de categorías con «Todas las categorías» desplegable y las categorías principales.
+- Cabecera `oscura` para temas oscuros.
+- En celular: menú hamburguesa y, opcional, barra inferior fija con 5 accesos (Inicio, Categorías, Ofertas, Ayuda, Mi cuenta) editables desde el panel; respeta el área segura del celular.
+- Footer variante `completo`: columnas de links, suscripción por email y redes.
+
+**Criterios de aceptación.**
+- [ ] Menú y desplegable se manejan con teclado y lector de pantalla (test).
+- [ ] La barra inferior no tapa el contenido ni el botón de compra a 390 px (e2e).
+
+---
+
+## T-054 · Tarjetas de producto y de categoría con insignias
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-045 · **Necesita a Arle:** no
+
+**Alcance.**
+- Tarjeta de producto configurable: insignia de texto con color (Más vendido, Oferta, Nuevo), porcentaje de descuento, precio tachado, corazón de favoritos, botón «Agregar al carrito» o botón de ícono, y formato horizontal compacto en celular.
+- Estrellas y cantidad de reseñas **solo si el producto tiene reseñas** (datos de T-055); sin reseñas no se muestra nada.
+- `category-grid` variantes `imagen-etiqueta` (foto con ícono y nombre abajo) e `inclinada` (cuadros en diagonal); en celular, fila deslizable.
+- Moneda y formato de precio según la tienda (ARS, MXN, COP, USD…).
+
+**Criterios de aceptación.**
+- [ ] Sin foto o sin reseñas la tarjeta no queda rota (test).
+- [ ] El descuento se calcula en servidor a partir de precio y precio de lista (test).
+
+---
+
+## T-055 · Reseñas y puntuación de productos (datos)
+- **Área:** db · **Ola:** 6 · **Depende de:** T-014, T-024 · **Necesita a Arle:** no
+
+**Alcance (una migración).** Tabla `product_reviews` (tienda, producto, pedido, puntaje 1 a 5, comentario, estado `pendiente|publicada|oculta`), con RLS por tienda. Solo quien compró el producto puede reseñar (por el link del pedido). El dueño modera desde el panel. Promedio y cantidad por producto en una vista o campo calculado. Escenarios SQL.
+
+**Criterios de aceptación.**
+- [ ] No se puede reseñar sin pedido pagado (escenario SQL).
+- [ ] Un usuario de otra tienda no ve ni modera reseñas.
+
+---
+
+## T-056 · Plantillas Tecnología y Repuestos
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-052, T-053, T-054 · **Necesita a Arle:** no
+
+**Alcance.** Rubros `tecnologia` y `repuestos` en `templates.ts`: portada con imagen de fondo, categorías con imagen y etiqueta, productos destacados con insignias, banner de promo, franja de confianza (envío, compra segura, devoluciones, garantía) y footer completo. Textos de ejemplo claros y editables. Disponibles en el asistente «Creá tu tienda».
+
+**Criterios de aceptación.**
+- [ ] Crear una tienda con cada rubro deja una portada publicable en tema oscuro (test).
+- [ ] Sin fotos subidas muestra espacios con aviso, no imágenes rotas.
+
+> **Fuera de este lote (decidir con Arle):** selector «Mi vehículo» con compatibilidad de repuestos por marca, modelo y año. Es una función grande (datos de compatibilidad por producto); solo tiene sentido si realmente se venden repuestos.
+
+---
+
+## T-057 · Stripe para Estados Unidos y España
 - **Área:** payments · **Ola:** 6 · **Depende de:** T-022 · **Necesita a Arle:** sí (cuenta de Stripe y claves de prueba, cargadas solo como secretos)
 
 **Alcance.** Adaptador `stripe` que implementa `PaymentProvider` con Checkout alojado por Stripe (los datos de tarjeta nunca pasan por el servidor propio), webhook con verificación de firma e idempotencia con `payment_events`, y efectos solo vía `apply_payment_status`. Cuenta conectada por tienda (Stripe Connect Standard). Se ofrece según país y moneda de la tienda.
