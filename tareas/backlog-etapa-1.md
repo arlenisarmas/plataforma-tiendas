@@ -52,7 +52,7 @@ aunque estén en la misma ola. Las olas solo agrupan; las dependencias mandan.
 | 6 | T-051 · Pantalla «Pagos» en el panel | admin | T-020, T-022 | — |
 | 6 | T-052 · Temas oscuros y portada con imagen de fondo | blocks | T-044 | — |
 | 6 | T-053 · Cabecera de dos niveles y barra inferior en celular | blocks | T-044 | — |
-| 6 | T-054 · Tarjetas de producto y de categoría con insignias | blocks | T-045 | — |
+| 6 | T-054 · Tarjetas de producto y de categoría con insignias | blocks | T-045, T-055 | — |
 | 6 | T-055 · Reseñas y puntuación de productos (datos) | db | T-014, T-024 | — |
 | 6 | T-056 · Plantillas Tecnología, Repuestos y Hogar | blocks | T-052, T-053, T-054 | — |
 | 6 | T-058 · Productos a medida: pedir presupuesto | admin | T-047, T-023 | — |
@@ -605,7 +605,8 @@ Corre en CI contra Supabase local.
 - **Área:** db · **Ola:** 6 · **Depende de:** T-014, T-022 · **Necesita a Arle:** no
 
 **Alcance (una migración, solo esta tarea toca la base).**
-- Tipo de producto `product_kind`: `physical` (por defecto), `digital`, `kit`. Los digitales no llevan stock ni envío.
+- Tipo de producto `product_kind`: `physical` (por defecto), `digital`, `kit`, `custom` (a medida, se cotiza: T-058). Los digitales no llevan stock ni envío; los `custom` no se pueden agregar al carrito.
+- Pedidos de presupuesto (T-058): tabla `quote_requests` (store_id, product_id, nombre, contacto, medidas, comentario, fotos, estado `new|answered|accepted|discarded`, order_id opcional) con RLS por tienda; el alta pública entra solo por Server Action con rate limiting, nunca por insert directo de `anon`.
 - Opciones de personalización por producto: tabla `product_personalizations` (id, store_id, product_id, etiqueta, tipo `text|choice|color|image`, obligatorio, opciones, largo máximo, orden) con RLS por tienda igual que `products`.
 - `order_items.personalization jsonb` con las respuestas del cliente (snapshot, no se modifica después).
 - Entrega digital: `products.digital_url` (link) o archivo en el bucket privado; la URL nunca se expone antes del pago aprobado.
@@ -616,6 +617,7 @@ Corre en CI contra Supabase local.
 - [ ] Un usuario de otra tienda no ve ni edita estas filas (escenario SQL).
 - [ ] Vender un kit descuenta el stock de cada componente y falla completo si falta uno.
 - [ ] `digital_url` no es legible por clientes con pedido sin pagar.
+- [ ] Un producto `custom` no puede reservar stock ni entrar en un pedido por carrito (escenario SQL).
 
 ---
 
@@ -702,7 +704,7 @@ Corre en CI contra Supabase local.
 ---
 
 ## T-054 · Tarjetas de producto y de categoría con insignias
-- **Área:** blocks · **Ola:** 6 · **Depende de:** T-045 · **Necesita a Arle:** no
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-045, T-055 · **Necesita a Arle:** no
 
 **Alcance.**
 - Tarjeta de producto configurable: insignia de texto con color (Más vendido, Oferta, Nuevo), porcentaje de descuento, precio tachado, corazón de favoritos, botón «Agregar al carrito» o botón de ícono, y formato horizontal compacto en celular.
