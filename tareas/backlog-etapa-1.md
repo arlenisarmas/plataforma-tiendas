@@ -42,6 +42,21 @@ aunque estén en la misma ola. Las olas solo agrupan; las dependencias mandan.
 | 5 | T-029 · Dominios propios | infra | T-028 | ⚠️ sí |
 | 5 | T-030 · Seguridad, observabilidad y rendimiento | infra | T-023 | — |
 | 5 | T-031 · Suite e2e de flujos críticos | qa | T-023, T-024, T-028 | — |
+| 6 | T-044 · Tema: paletas y tipografías por tienda | blocks | T-008 | — |
+| 6 | T-045 · Bloques de portada y confianza | blocks | T-044 | — |
+| 6 | T-046 · Plantillas Vasos & Tazas y Mascotas | blocks | T-045 | — |
+| 6 | T-047 · Datos: personalización, producto digital y kits | db | T-014, T-022 | — |
+| 6 | T-048 · Personalización de productos | admin | T-047, T-023 | — |
+| 6 | T-049 · Producto digital: entrega tras el pago | storefront | T-047, T-025 | — |
+| 6 | T-050 · Kits de productos | admin | T-047 | — |
+| 6 | T-051 · Pantalla «Pagos» en el panel | admin | T-020, T-022 | — |
+| 6 | T-052 · Temas oscuros y portada con imagen de fondo | blocks | T-044 | — |
+| 6 | T-053 · Cabecera de dos niveles y barra inferior en celular | blocks | T-044 | — |
+| 6 | T-054 · Tarjetas de producto y de categoría con insignias | blocks | T-045, T-055 | — |
+| 6 | T-055 · Reseñas y puntuación de productos (datos) | db | T-014, T-024 | — |
+| 6 | T-056 · Plantillas Tecnología, Repuestos y Hogar | blocks | T-052, T-053, T-054 | — |
+| 6 | T-058 · Productos a medida: pedir presupuesto | admin | T-047, T-023 | — |
+| 6 | T-057 · Stripe para Estados Unidos y España | payments | T-022 | ⚠️ sí |
 
 ---
 
@@ -517,3 +532,236 @@ Corre en CI contra Supabase local.
 
 **Criterios de aceptación.**
 - [ ] Los 6 flujos pasan en CI.
+
+---
+
+# Lote 7 · Dos tiendas reales sobre el motor
+
+> Objetivo: que **Vasos & Tazas Personalizadas** (rosa/violeta) y **Che Peludos** (amarillo/azul)
+> se puedan armar en el motor con su diseño propio, vender en varios países y cobrar sin que Arle
+> toque la pasarela. Los diseños de referencia están en el canvas «Boceto tienda y panel admin»
+> (tableros «Nuevo · Inicio», «Nuevo · Producto» y «Che Peludos · Inicio»).
+> El código del Che Peludos actual (Next.js + Prisma, repo privado `chepeludos-cloud/che-peludos`)
+> es solo **inspiración**: no se migra ni se toca en este lote.
+
+**Tokens de diseño de referencia (aproximados; ajustar a contraste AA con `contrastRatio`).**
+
+| Tienda | Fondo | Texto | Principal | Acento | Superficie | Letras |
+|---|---|---|---|---|---|---|
+| Vasos & Tazas | `#FBF7FF` | `#2A0F5A` | `#D90F6E` | `#7C3AED` | `#F1E8FF` | Baloo 2 (títulos), Nunito |
+| Che Peludos | `#FFFFFF` | `#111111` | `#1565C0` | `#FFC107` | `#FFF9EF` | Poppins, Pacifico (detalles) |
+
+## T-044 · Tema: paletas y tipografías por tienda
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-008 · **Necesita a Arle:** no
+
+**Objetivo.** Que cada tienda pueda tener paleta y letras propias, no solo las 5 paletas y las 4 fuentes del sistema.
+
+**Alcance.**
+- `packages/blocks/src/theme.ts`: sumar las paletas curadas `vasos-tazas` y `che-peludos` (valores de la tabla, corregidos para pasar `WCAG AA`; los textos blancos sobre color principal deben cumplir 4,5:1).
+- Sumar los pares de letras `divertida` (Baloo 2 + Nunito) y `calida` (Poppins + Pacifico para detalles), cargadas con `next/font/google` en el storefront; en el admin la vista previa usa las mismas.
+- `themeToCssVars` expone `--theme-font-display` además de `--theme-font-body`.
+- Ampliar los enums de `themeSchema` (paleta y letras). El tema se guarda en `stores.theme_draft`/`theme_published` (`jsonb`), así que **no hay migración**: los temas guardados siguen válidos tal cual.
+- Textos del selector en `packages/i18n/messages/es-419`.
+
+**Criterios de aceptación.**
+- [ ] Temas existentes siguen validando sin cambios (test).
+- [ ] Las dos paletas nuevas pasan el chequeo de contraste (test).
+- [ ] La vista previa del armado guiado muestra las letras nuevas.
+
+---
+
+## T-045 · Bloques de portada y confianza
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-044 · **Necesita a Arle:** no
+
+**Objetivo.** Los bloques que faltan para parecerse a los diseños de referencia.
+
+**Alcance** (cada uno cumple `docs/03-sistema-de-bloques.md`: schema, ≥2 variantes, textos i18n, miniatura, tests).
+- `hero` variante `tarjetas`: tarjeta grande (título, subtítulo, botón, insignia de precio, imagen con fondo de color) y hasta 2 tarjetas de promo a la derecha; en celular se apilan.
+- `announcement-bar` variante `marquesina`: texto en movimiento, se pausa al pasar el mouse, quieta con «reducir movimiento».
+- Bloque nuevo `trust-strip` («¿Por qué elegirnos?»): 3 a 4 ítems con imagen o ícono, título y texto.
+- `category-grid` variante `circulos`: categorías en círculos con foto y nombre, carrusel horizontal en celular.
+- Bloque nuevo `steps` («¿Cómo funciona?»): pasos con ícono, título y texto.
+- Bloque nuevo `promo-strip`: franja de color con texto y link (ej. «15% de descuento en tu primera compra»).
+
+**Criterios de aceptación.**
+- [ ] Todos se ven bien a 390 px y a 1280 px sin scroll horizontal (e2e de capturas).
+- [ ] Imágenes con `alt` y sin romper el layout si faltan.
+- [ ] Ningún texto fijo en el código: todo editable desde el editor de páginas.
+
+---
+
+## T-046 · Plantillas Vasos & Tazas y Mascotas
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-045 · **Necesita a Arle:** no
+
+**Alcance.** En `packages/blocks/src/templates.ts` sumar los rubros `vasos-tazas` (paleta y letras de T-044; portada con `hero` `tarjetas`, `category-grid` `circulos` con Tazas, Vasos, Cursos y Kits, `steps`, productos destacados) y `mascotas-premium` (paleta Che Peludos; `announcement-bar` `marquesina`, `promo-strip`, `hero` `tarjetas`, `trust-strip`, `category-grid` `circulos`, productos destacados). Disponibles en el asistente «Creá tu tienda».
+
+**Criterios de aceptación.**
+- [ ] Crear una tienda con cada rubro deja una portada publicable con textos de ejemplo claros (test).
+- [ ] Las plantillas anteriores no cambian (test).
+
+---
+
+## T-047 · Datos: personalización, producto digital y kits
+- **Área:** db · **Ola:** 6 · **Depende de:** T-014, T-022 · **Necesita a Arle:** no
+
+**Alcance (una migración, solo esta tarea toca la base).**
+- Tipo de producto `product_kind`: `physical` (por defecto), `digital`, `kit`, `custom` (a medida, se cotiza: T-058). Los digitales no llevan stock ni envío; los `custom` no se pueden agregar al carrito.
+- Pedidos de presupuesto (T-058): tabla `quote_requests` (store_id, product_id, nombre, contacto, medidas, comentario, fotos, estado `new|answered|accepted|discarded`, order_id opcional) con RLS por tienda; el alta pública entra solo por Server Action con rate limiting, nunca por insert directo de `anon`.
+- Opciones de personalización por producto: tabla `product_personalizations` (id, store_id, product_id, etiqueta, tipo `text|choice|color|image`, obligatorio, opciones, largo máximo, orden) con RLS por tienda igual que `products`.
+- `order_items.personalization jsonb` con las respuestas del cliente (snapshot, no se modifica después).
+- Entrega digital: `products.digital_url` (link) o archivo en el bucket privado; la URL nunca se expone antes del pago aprobado.
+- Kits: tabla `kit_items` (kit_id, product_id, cantidad); descontar stock de los componentes con las funciones existentes.
+- Actualizar tipos generados y escenarios SQL.
+
+**Criterios de aceptación.**
+- [ ] Un usuario de otra tienda no ve ni edita estas filas (escenario SQL).
+- [ ] Vender un kit descuenta el stock de cada componente y falla completo si falta uno.
+- [ ] `digital_url` no es legible por clientes con pedido sin pagar.
+- [ ] Un producto `custom` no puede reservar stock ni entrar en un pedido por carrito (escenario SQL).
+
+---
+
+## T-048 · Personalización de productos
+- **Área:** admin · **Ola:** 6 · **Depende de:** T-047, T-023 · **Necesita a Arle:** no
+
+**Alcance.**
+- Panel: en el editor de producto, sección «Personalización» para agregar campos (ej. «Nombre en la taza», «Personaje», «Color»).
+- Página de producto: formulario con esos campos, validación en servidor (largo, obligatorios), vista previa del texto.
+- Carrito y compra: las respuestas viajan con cada ítem, se guardan en `order_items.personalization` y se muestran en el pedido del panel, en el email al cliente y al dueño.
+- Imagen subida por el cliente: solo tipos y tamaño permitidos, bucket privado.
+
+**Criterios de aceptación.**
+- [ ] Dos unidades del mismo producto con distinta personalización son líneas separadas del carrito (test).
+- [ ] No se acepta HTML ni scripts en los textos (test).
+- [ ] e2e: comprar una taza con nombre en celular y verlo en el pedido del panel.
+
+---
+
+## T-049 · Producto digital: entrega tras el pago
+- **Área:** storefront · **Ola:** 6 · **Depende de:** T-047, T-025 · **Necesita a Arle:** no
+
+**Alcance.** En compras con productos solo digitales se omite el paso de entrega; al pasar el pago a `approved` (también al aprobar manualmente un comprobante) se muestra el acceso en «Mi pedido» y se envía por email. Si el pedido mezcla físico y digital, se piden ambos. Reenviar acceso desde el panel.
+
+**Criterios de aceptación.**
+- [ ] Antes del pago aprobado no se ve el link (test).
+- [ ] Webhook repetido no manda dos emails (test).
+- [ ] e2e: curso comprado con pago manual y aprobado por el dueño.
+
+---
+
+## T-050 · Kits de productos
+- **Área:** admin · **Ola:** 6 · **Depende de:** T-047 · **Necesita a Arle:** no
+
+**Alcance.** Panel: armar un kit eligiendo productos y cantidades, con precio propio y precio «por separado» tachado. Tienda: la ficha del kit lista sus componentes; disponible solo si todos tienen stock.
+
+**Criterios de aceptación.**
+- [ ] Un componente sin stock deja el kit «sin stock» (test).
+- [ ] Editar un componente no cambia pedidos ya hechos.
+
+---
+
+## T-051 · Pantalla «Pagos» en el panel
+- **Área:** admin · **Ola:** 6 · **Depende de:** T-020, T-022 · **Necesita a Arle:** no
+
+**Alcance.** Una sola pantalla para cada tienda: conectar Mercado Pago (OAuth) con estado claro, configurar pago manual (transferencia, alias, instrucciones, comprobante), y ver qué medios se ofrecen según el país del cliente. Mensajes simples, sin términos técnicos. Nunca se muestran tokens.
+
+**Criterios de aceptación.**
+- [ ] Conectar y desconectar Mercado Pago deja el estado correcto (test con doble de prueba).
+- [ ] El dueño sin permiso de pagos no ve la pantalla (test).
+
+---
+
+## T-052 · Temas oscuros y portada con imagen de fondo
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-044 · **Necesita a Arle:** no
+
+**Objetivo.** Que el motor haga tiendas oscuras como las de referencia «TechZone» (azul noche, cian y violeta) y «AutoParts» (negro, rojo y crema).
+
+**Alcance.**
+- Paletas curadas `tecnologia` y `repuestos`, con fondo oscuro, que pasen contraste AA para texto, botones y precios (usar `contrastRatio`). El tema guarda si es claro u oscuro y la tienda lo respeta en todas las páginas, incluido el carrito y la compra.
+- `hero` variante `imagen-fondo`: imagen a todo el ancho, texto a la izquierda, botón principal y hasta 3 íconos de confianza debajo. Capa oscura automática detrás del texto para que siempre se lea; imagen de celular distinta de la de computadora, opcional.
+- `hero` admite varias diapositivas con puntos indicadores (carrusel simple, sin autoplay si «reducir movimiento»).
+
+**Criterios de aceptación.**
+- [ ] El texto del hero cumple AA sobre cualquier imagen subida (test con imagen clara y oscura).
+- [ ] Carrito y compra se ven bien en tema oscuro (capturas e2e).
+- [ ] Temas claros existentes no cambian (test).
+
+---
+
+## T-053 · Cabecera de dos niveles y barra inferior en celular
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-044 · **Necesita a Arle:** no
+
+**Alcance.**
+- Cabecera variante `dos-niveles`: franja superior con avisos y links (envíos, atención al cliente, seguimiento de pedido), barra principal con logo, buscador con botón y carrito, y barra de categorías con «Todas las categorías» desplegable y las categorías principales.
+- Cabecera `oscura` para temas oscuros.
+- En celular: menú hamburguesa y, opcional, barra inferior fija con 5 accesos (Inicio, Categorías, Ofertas, Ayuda, Mi cuenta) editables desde el panel; respeta el área segura del celular.
+- Footer variante `completo`: columnas de links, suscripción por email y redes.
+
+**Criterios de aceptación.**
+- [ ] Menú y desplegable se manejan con teclado y lector de pantalla (test).
+- [ ] La barra inferior no tapa el contenido ni el botón de compra a 390 px (e2e).
+
+---
+
+## T-054 · Tarjetas de producto y de categoría con insignias
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-045, T-055 · **Necesita a Arle:** no
+
+**Alcance.**
+- Tarjeta de producto configurable: insignia de texto con color (Más vendido, Oferta, Nuevo), porcentaje de descuento, precio tachado, corazón de favoritos, botón «Agregar al carrito» o botón de ícono, y formato horizontal compacto en celular.
+- Estrellas y cantidad de reseñas **solo si el producto tiene reseñas** (datos de T-055); sin reseñas no se muestra nada.
+- `category-grid` variantes `imagen-etiqueta` (foto con ícono y nombre abajo) e `inclinada` (cuadros en diagonal); en celular, fila deslizable.
+- Moneda y formato de precio según la tienda (ARS, MXN, COP, USD…).
+
+**Criterios de aceptación.**
+- [ ] Sin foto o sin reseñas la tarjeta no queda rota (test).
+- [ ] El descuento se calcula en servidor a partir de precio y precio de lista (test).
+
+---
+
+## T-055 · Reseñas y puntuación de productos (datos)
+- **Área:** db · **Ola:** 6 · **Depende de:** T-014, T-024 · **Necesita a Arle:** no
+
+**Alcance (una migración).** Tabla `product_reviews` (tienda, producto, pedido, puntaje 1 a 5, comentario, estado `pendiente|publicada|oculta`), con RLS por tienda. Solo quien compró el producto puede reseñar (por el link del pedido). El dueño modera desde el panel. Promedio y cantidad por producto en una vista o campo calculado. Escenarios SQL.
+
+**Criterios de aceptación.**
+- [ ] No se puede reseñar sin pedido pagado (escenario SQL).
+- [ ] Un usuario de otra tienda no ve ni modera reseñas.
+
+---
+
+## T-056 · Plantillas Tecnología, Repuestos y Hogar
+- **Área:** blocks · **Ola:** 6 · **Depende de:** T-052, T-053, T-054 · **Necesita a Arle:** no
+
+**Alcance.** Rubros `tecnologia`, `repuestos` y `hogar-muebles` (paleta marrón, arena, crema y verde; categorías «Explorá por ambiente» con foto; claro, sin tema oscuro) en `templates.ts`: portada con imagen de fondo, categorías con imagen y etiqueta, productos destacados con insignias, banner de promo, franja de confianza (envío, compra segura, devoluciones, garantía) y footer completo. Textos de ejemplo claros y editables. Disponibles en el asistente «Creá tu tienda».
+
+**Criterios de aceptación.**
+- [ ] Crear una tienda con cada rubro deja una portada publicable (test).
+- [ ] Sin fotos subidas muestra espacios con aviso, no imágenes rotas.
+
+> **Fuera de este lote (decidir con Arle):** selector «Mi vehículo» con compatibilidad de repuestos por marca, modelo y año. Es una función grande (datos de compatibilidad por producto); solo tiene sentido si realmente se venden repuestos.
+
+---
+
+## T-058 · Productos a medida: pedir presupuesto
+- **Área:** admin · **Ola:** 6 · **Depende de:** T-047, T-023 · **Necesita a Arle:** no
+
+**Objetivo.** Para cocinas, closets y muebles a medida (carpintería): productos que no se pagan en el momento sino que se cotizan.
+
+**Alcance.** Producto con modo «A medida»: en vez de «Agregar al carrito» muestra «Pedir presupuesto» con precio «desde» opcional. Formulario corto (nombre, contacto, medidas, comentario y fotos opcionales) y botón de WhatsApp con el producto ya citado. Los pedidos de presupuesto llegan al panel en una lista con estados (nuevo, respondido, aceptado, descartado) y por email al dueño. Al aceptar, el dueño puede convertirlo en pedido con el precio acordado y un link de pago (Mercado Pago o manual).
+
+**Criterios de aceptación.**
+- [ ] Un producto a medida no se puede comprar por carrito ni por URL directa (test).
+- [ ] Las fotos del cliente van a un bucket privado con tipos y tamaño limitados.
+- [ ] Rate limiting y anti-spam en el formulario.
+
+---
+
+## T-057 · Stripe para Estados Unidos y España
+- **Área:** payments · **Ola:** 6 · **Depende de:** T-022 · **Necesita a Arle:** sí (cuenta de Stripe y claves de prueba, cargadas solo como secretos)
+
+**Alcance.** Adaptador `stripe` que implementa `PaymentProvider` con Checkout alojado por Stripe (los datos de tarjeta nunca pasan por el servidor propio), webhook con verificación de firma e idempotencia con `payment_events`, y efectos solo vía `apply_payment_status`. Cuenta conectada por tienda (Stripe Connect Standard). Se ofrece según país y moneda de la tienda.
+
+**Criterios de aceptación.**
+- [ ] Firma inválida → 401 sin efectos (test).
+- [ ] Webhook repetido no produce efectos dobles (test).
+- [ ] Ninguna clave aparece en tablas, logs ni respuestas.
